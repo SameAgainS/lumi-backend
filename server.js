@@ -10,9 +10,12 @@ app.get("/", (req, res) => {
   res.send("LUMI backend is alive 🚀");
 });
 
+app.get("/chat", (req, res) => {
+  res.send("CHAT endpoint is alive ✅");
+});
+
 app.post("/chat", (req, res) => {
   const { message } = req.body;
-
   res.json({
     reply: `LUMI počula: "${message}"`
   });
