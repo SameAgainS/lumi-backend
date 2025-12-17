@@ -1,56 +1,52 @@
-import express from "express";
-import cors from "cors";
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-// 🔹 jednoduchý globálny stav
-let mode = "default";
-
-app.get("/", (req, res) => {
-  res.send("LUMI backend is alive 🚀");
-});
+let currentMode = "default";
 
 app.post("/chat", (req, res) => {
   const { message } = req.body;
+  const text = message?.trim();
 
-  // 🧠 PRÍKAZY
-  if (message === "/coach") {
-    mode = "coach";
+  console.log("MODE:", currentMode, "| MESSAGE:", text);
+
+  // 🔹 COMMANDS
+  if (text?.startsWith("/")) {
+    if (text === "/coach") {
+      currentMode = "coach";
+      return res.json({
+        from: "system",
+        type: "mode",
+        reply: "🧠 Coach mód zapnutý. Poďme makať 💪"
+      });
+    }
+
+    if (text === "/default") {
+      currentMode = "default";
+      return res.json({
+        from: "system",
+        type: "mode",
+        reply: "🙂 Default mód zapnutý."
+      });
+    }
+
     return res.json({
       from: "system",
-      reply: "💪 OK. Prepínam sa do COACH módu. Poďme makať."
+      type: "error",
+      reply: "❓ Neznámy príkaz."
     });
   }
 
-  if (message === "/default") {
-    mode = "default";
+  // 🔹 MODE RESPONSES
+  if (currentMode === "coach") {
     return res.json({
-      from: "system",
-      reply: "🙂 Som späť v normálnom režime."
+      from: "LUMI",
+      type: "coach",
+      reply: `💪 Poďme na to. Povedal si: "${text}". Čo je tvoj cieľ?`
     });
   }
 
-  // 🤖 ODPOVEDE PODĽA REŽIMU
-  if (mode === "coach") {
-    return res.json({
-      from: "LUMI_coach",
-      reply: `💡 Počujem ťa. Povedal si: "${message}".  
-Čo je **jedna malá vec**, ktorú vieš urobiť dnes, aby to bolo o 1 % lepšie?`
-    });
-  }
-
-  // default
+  // 🔹 DEFAULT
   return res.json({
-    from: "LUMI_default",
-    reply: `Rozumiem. Povedal si: "${message}"`
+    from: "LUMI",
+    type: "default",
+    reply: `Rozumiem. Povedal si: "${text}"`
   });
 });
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`LUMI server running on port ${PORT}`);
-});
-
 
