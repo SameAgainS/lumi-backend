@@ -7,97 +7,139 @@ const PORT = process.env.PORT || 10000;
 app.use(cors());
 app.use(express.json());
 
-/**
- * 🧠 PAMÄŤ LUMI
- * (zatím len v RAM – neskôr DB)
- */
-const memory = {
+/* =========================
+   🧠 USER PROFIL + PAMÄŤ
+========================= */
+const state = {
+  user: {
+    name: null,
+    goal: null,
+    style: "soft", // soft | direct | brutal
+  },
   mode: "default", // default | coach
+  emotion: "neutral", // neutral | sad | frustrated | motivated
   lastUserMessage: null,
-  lastLumiReply: null,
 };
 
-/**
- * 🤍 DEFAULT MÓD – prirodzený rozhovor
- */
-function replyDefault(message) {
-  if (!memory.lastUserMessage) {
-    return "Ahoj 😊 Som LUMI. Ako sa dnes cítiš?";
-  }
+/* =========================
+   🎭 EMOTION DETECTION
+========================= */
+function detectEmotion(text) {
+  const t = text.toLowerCase();
 
-  return `Rozumiem. Pred chvíľou si hovoril: "${memory.lastUserMessage}".  
-Čo sa odvtedy zmenilo?`;
+  if (t.includes("nemám") || t.includes("nebaví") || t.includes("nič")) {
+    return "frustrated";
+  }
+  if (t.includes("smutný") || t.includes("zle")) {
+    return "sad";
+  }
+  if (t.includes("idem") || t.includes("chcem") || t.includes("poďme")) {
+    return "motivated";
+  }
+  return "neutral";
 }
 
-/**
- * 💪 COACH MÓD – motivačný, priamy
- */
-function replyCoach(message) {
-  if (!memory.lastUserMessage) {
-    return "💪 Som tvoj COACH. Čo ťa teraz najviac brzdí?";
-  }
-
-  return `Počujem ťa. Hovoril si: "${memory.lastUserMessage}".  
-Poďme to rozbiť na malé kroky. Čo je prvá vec, ktorú vieš spraviť hneď teraz?`;
+/* =========================
+   🤍 DEFAULT MODE
+========================= */
+function defaultReply(msg) {
+  return `Rozumiem. Povedal si: "${msg}".  
+Chceš sa o tom porozprávať viac?`;
 }
 
-/**
- * 🚀 HLAVNÝ CHAT ENDPOINT
- */
+/* =========================
+   💪 COACH MODE (LEVELY)
+========================= */
+function coachReply(msg) {
+  switch (state.user.style) {
+    case "brutal":
+      return `Tvrdá pravda: nikto ťa nepríde zachrániť.  
+Aký je JEDEN krok, ktorý spravíš dnes?`;
+
+    case "direct":
+      return `OK. Poďme vecne.  
+Čo konkrétne ti teraz bráni spraviť ďalší krok?`;
+
+    default:
+      return `Počujem ťa.  
+Čo by ti teraz najviac pomohlo posunúť sa aspoň o 1 %?`;
+  }
+}
+
+/* =========================
+   🚀 CHAT ENDPOINT
+========================= */
 app.post("/chat", (req, res) => {
   const { message } = req.body;
-
   if (!message) {
-    return res.status(400).json({
-      from: "system",
-      reply: "❌ Chýba správa.",
-    });
+    return res.status(400).json({ reply: "❌ Chýba správa." });
   }
 
-  let reply = "";
-  let from = "LUMI_default";
+  // uložiť emóciu
+  state.emotion = detectEmotion(message);
+  state.lastUserMessage = message;
 
-  // 🔀 PRÍKAZY
+  let reply = "";
+  let from = "LUMI";
+
+  /* ===== COMMANDS ===== */
   if (message.startsWith("/coach")) {
-    memory.mode = "coach";
-    reply = "💛 OK. Prepínam sa do COACH módu. Poďme makať.";
+    state.mode = "coach";
+    reply = "💪 COACH mód aktivovaný. Poďme makať.";
     from = "system";
-  } else if (message.startsWith("/default")) {
-    memory.mode = "default";
-    reply = "🤍 OK. Späť do normálneho rozhovoru.";
+  }
+
+  else if (message.startsWith("/style")) {
+    const style = message.split(" ")[1];
+    if (["soft", "direct", "brutal"].includes(style)) {
+      state.user.style = style;
+      reply = `🧠 Štýl nastavený na: ${style}`;
+      from = "system";
+    } else {
+      reply = "Použi: /style soft | direct | brutal";
+      from = "system";
+    }
+  }
+
+  else if (message.startsWith("/name")) {
+    state.user.name = message.replace("/name", "").trim();
+    reply = `🤍 Teší ma, ${state.user.name}.`;
     from = "system";
-  } else {
-    // 🧠 Odpoveď podľa módu
-    if (memory.mode === "coach") {
-      reply = replyCoach(message);
+  }
+
+  else if (message.startsWith("/goal")) {
+    state.user.goal = message.replace("/goal", "").trim();
+    reply = `🎯 Cieľ uložený: ${state.user.goal}`;
+    from = "system";
+  }
+
+  /* ===== NORMAL CHAT ===== */
+  else {
+    if (state.mode === "coach") {
+      reply = coachReply(message);
       from = "LUMI_coach";
     } else {
-      reply = replyDefault(message);
+      reply = defaultReply(message);
       from = "LUMI_default";
     }
   }
 
-  // 🧠 ULOŽIŤ PAMÄŤ AŽ PO VÝPOČTE ODPOVEDE
-  memory.lastUserMessage = message;
-  memory.lastLumiReply = reply;
-
   res.json({
     from,
-    mode: memory.mode,
+    mode: state.mode,
+    style: state.user.style,
+    emotion: state.emotion,
     reply,
   });
 });
 
-/**
- * 🟢 HEALTH CHECK
- */
+/* =========================
+   🟢 HEALTH
+========================= */
 app.get("/", (req, res) => {
-  res.send("✅ LUMI backend is running");
+  res.send("✅ LUMI v2 online");
 });
 
-/**
- * 🔊 START SERVER
- */
 app.listen(PORT, () => {
-  console.log(`🚀 LUMI server running on port ${PORT}`);
+  console.log(`🚀 LUMI v2 running on ${PORT}`);
 });
