@@ -51,4 +51,8 @@ app.post("/api/chat", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`🌙 LUMI server running at http://localhost:${PORT}`);
+app.get("/", (req, res) => {
+  res.send("LUMI backend is alive 🚀");
+});
+
 });
