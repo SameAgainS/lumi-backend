@@ -2,130 +2,192 @@ import express from "express";
 import cors from "cors";
 
 const app = express();
+const PORT = process.env.PORT || 10000;
+
+/* =========================
+   MIDDLEWARE
+========================= */
 app.use(cors());
 app.use(express.json());
 
-// =========================
-// GLOBAL STATE (LUMI)
-// =========================
+/* =========================
+   LUMI STATE (MOZOG)
+========================= */
 let state = {
-  mode: "default",   // default | coach
-  style: "normal",   // normal | brutal
-  emotion: "neutral"
+  mode: "default",      // default | coach
+  style: "soft",        // soft | normal | brutal
+  emotion: "neutral",   // neutral | sad | angry | tired | focused
+  memory: {
+    lastProblem: null,
+    lastGoal: null
+  }
 };
 
-// =========================
-// HELPERS
-// =========================
-function systemReply(reply, extra = {}) {
-  return {
-    from: "system",
-    ...state,
-    ...extra,
-    reply
-  };
-}
-
-function lumiReply(from, reply) {
+/* =========================
+   HELPER
+========================= */
+function reply(from, text) {
   return {
     from,
-    ...state,
-    reply
+    mode: state.mode,
+    style: state.style,
+    emotion: state.emotion,
+    reply: text
   };
 }
 
-// =========================
-// COMMAND HANDLERS
-// =========================
-function handleCommand(message) {
-  const cmd = message.trim().toLowerCase();
+/* =========================
+   COMMAND HANDLERS
+========================= */
+function handleCommand(message, res) {
 
-  // /reset
-  if (cmd === "/reset") {
+  // RESET
+  if (message === "/reset") {
     state = {
       mode: "default",
-      style: "normal",
-      emotion: "neutral"
+      style: "soft",
+      emotion: "neutral",
+      memory: {
+        lastProblem: null,
+        lastGoal: null
+      }
     };
-    return systemReply("🔄 LUMI resetnutá. Začíname odznova.");
+
+    return res.json(
+      reply("LUMI_default", "🔄 Reset hotový. Začíname odznova. Ako sa cítiš?")
+    );
   }
 
-  // /coach
-  if (cmd === "/coach") {
-    state.mode = "coach";
-    return systemReply("💪 OK. Prepínam sa do COACH módu. Poďme makať.");
-  }
-
-  // /style brutal
-  if (cmd.startsWith("/style")) {
-    const parts = cmd.split(" ");
-    if (parts[1]) {
-      state.style = parts[1];
-      return systemReply(`🎭 Štýl nastavený na: ${state.style}`);
-    }
-    return systemReply("⚠️ Zadaj štýl. Napr: /style brutal");
-  }
-
-  return null;
-}
-
-// =========================
-// MESSAGE HANDLER
-// =========================
-function handleMessage(message) {
   // COACH MODE
-  if (state.mode === "coach") {
-    if (state.style === "brutal") {
-      return lumiReply(
-        "LUMI_coach",
-        `Tvrdá pravda: nikto ťa nepríde zachrániť.\nAký je JEDEN krok, ktorý spravíš dnes?`
+  if (message === "/coach") {
+    state.mode = "coach";
+    return res.json(
+      reply("system", "💪 OK. Prepínam do COACH módu. Poďme makať.")
+    );
+  }
+
+  // STYLE
+  if (message.startsWith("/style")) {
+    const style = message.split(" ")[1];
+    const allowed = ["soft", "normal", "brutal"];
+
+    if (allowed.includes(style)) {
+      state.style = style;
+      return res.json(
+        reply("system", `🎨 Štýl nastavený na: ${style}`)
       );
     }
 
-    return lumiReply(
-      "LUMI_coach",
-      "Počujem ťa. Čo je teraz najväčší problém, ktorý chceš riešiť?"
+    return res.json(
+      reply("system", "❌ Použi: /style soft | normal | brutal")
+    );
+  }
+
+  // MOOD
+  if (message.startsWith("/mood")) {
+    const mood = message.split(" ")[1];
+    const allowed = ["neutral", "sad", "angry", "tired", "focused"];
+
+    if (allowed.includes(mood)) {
+      state.emotion = mood;
+      return res.json(
+        reply("system", `🧠 Emócia nastavená na: ${mood}`)
+      );
+    }
+
+    return res.json(
+      reply("system", "❌ Použi: /mood neutral | sad | angry | tired | focused")
+    );
+  }
+
+  return false;
+}
+
+/* =========================
+   CHAT ENDPOINT
+========================= */
+app.post("/chat", (req, res) => {
+  const message = (req.body.message || "").trim();
+
+  // COMMANDS
+  const handled = handleCommand(message, res);
+  if (handled !== false) return;
+
+  /* =========================
+     MEMORY DETECTION
+  ========================= */
+  if (/nemám|neviem|trápi|ťažké/i.test(message)) {
+    state.memory.lastProblem = message;
+  }
+
+  if (/chcem|cieľ|budem|plánujem/i.test(message)) {
+    state.memory.lastGoal = message;
+  }
+
+  /* =========================
+     RESPONSE LOGIC
+  ========================= */
+
+  // COACH MODE
+  if (state.mode === "coach") {
+
+    if (state.emotion === "tired") {
+      return res.json(
+        reply(
+          "LUMI_coach",
+          "Si unavený. Nehraj sa na hrdinu. Aký je najmenší krok, ktorý dnes zvládneš?"
+        )
+      );
+    }
+
+    if (state.emotion === "angry") {
+      return res.json(
+        reply(
+          "LUMI_coach",
+          "Hnev je energia. Kam ju dnes nasmeruješ?"
+        )
+      );
+    }
+
+    if (state.style === "brutal") {
+      return res.json(
+        reply(
+          "LUMI_coach",
+          "Tvrdá pravda: nikto ťa nepríde zachrániť. Aký je JEDEN krok, ktorý spravíš dnes?"
+        )
+      );
+    }
+
+    if (state.style === "soft") {
+      return res.json(
+        reply(
+          "LUMI_coach",
+          "Som tu s tebou. Povedz mi, čo je teraz pre teba najťažšie."
+        )
+      );
+    }
+
+    return res.json(
+      reply(
+        "LUMI_coach",
+        "Poďme to rozbiť na malé kroky. Čo je prvá vec, ktorú môžeme spraviť?"
+      )
     );
   }
 
   // DEFAULT MODE
-  return lumiReply(
-    "LUMI_default",
-    `❤️ Rozumiem. Povedal si: "${message}"`
+  return res.json(
+    reply(
+      "LUMI_default",
+      `❤️ Rozumiem. Povedal si: "${message}".  
+Chceš sa o tom porozprávať viac?`
+    )
   );
-}
-
-// =========================
-// ROUTES
-// =========================
-app.get("/", (req, res) => {
-  res.send("LUMI backend is alive 🚀");
 });
 
-app.post("/chat", (req, res) => {
-  const { message } = req.body;
-
-  if (!message) {
-    return res.json(systemReply("⚠️ Chýba správa."));
-  }
-
-  // COMMAND?
-  if (message.startsWith("/")) {
-    const commandResponse = handleCommand(message);
-    if (commandResponse) {
-      return res.json(commandResponse);
-    }
-  }
-
-  // NORMAL MESSAGE
-  const reply = handleMessage(message);
-  res.json(reply);
-});
-
-// =========================
-// START SERVER
-// =========================
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🔥 LUMI server running on port ${PORT}`);
+/* =========================
+   START SERVER
+========================= */
+app.listen(PORT, () => {
+  console.log(`🚀 LUMI server running on port ${PORT}`);
 });
