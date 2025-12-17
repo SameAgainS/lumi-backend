@@ -5,11 +5,61 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 🧠 jednoduchá pamäť
-let memory = {
-  lastUserMessage: null
-};
+/* -------------------------
+   LUMI – message classifier
+--------------------------*/
+function classifyMessage(text) {
+  const msg = text.toLowerCase();
 
+  if (
+    msg.includes("ahoj") ||
+    msg.includes("čau") ||
+    msg.includes("cau") ||
+    msg.includes("hello") ||
+    msg.includes("hi")
+  ) {
+    return "greeting";
+  }
+
+  if (
+    msg.includes("nič") ||
+    msg.includes("zle") ||
+    msg.includes("na hovno") ||
+    msg.includes("smutno") ||
+    msg.includes("nahovno")
+  ) {
+    return "negative";
+  }
+
+  if (msg.endsWith("?")) {
+    return "question";
+  }
+
+  return "default";
+}
+
+/* -------------------------
+   LUMI – response engine
+--------------------------*/
+function generateReply(type, message) {
+  switch (type) {
+    case "greeting":
+      return "Ahoj 👋 som LUMI. Ako sa dnes cítiš?";
+
+    case "negative":
+      return "Mrzí ma, že to tak cítiš 😔 Chceš mi povedať, čo sa deje?";
+
+    case "question":
+      return "Zaujímavá otázka 🤔 Skús mi ju trochu rozvinúť.";
+
+    default:
+      return `Rozumiem. Povedal si: "${message}"`;
+  }
+}
+
+/* -------------------------
+   Routes
+--------------------------*/
 app.get("/", (req, res) => {
   res.send("LUMI backend is alive 🚀");
 });
@@ -17,23 +67,27 @@ app.get("/", (req, res) => {
 app.post("/chat", (req, res) => {
   const { message } = req.body;
 
-  let reply = "";
-
   if (!message) {
-    reply = "Prosím, napíš mi niečo 🙂";
-  } else if (memory.lastUserMessage) {
-    reply = `Spomínal si predtým: "${memory.lastUserMessage}". Chceš na to nadviazať?`;
-  } else {
-    reply = `Ahoj 😊 Som LUMI. Povedz mi viac.`;
+    return res.status(400).json({
+      error: "Message is required",
+    });
   }
 
-  // uložíme pamäť
-  memory.lastUserMessage = message;
+  const type = classifyMessage(message);
+  const reply = generateReply(type, message);
 
-  res.json({ reply });
+  res.json({
+    from: "LUMI",
+    type,
+    reply,
+  });
 });
 
-const PORT = process.env.PORT || 3000;
+/* -------------------------
+   Server start
+--------------------------*/
+const PORT = process.env.PORT || 10000;
+
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`LUMI server running on port ${PORT}`);
 });
