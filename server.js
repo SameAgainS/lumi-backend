@@ -2,63 +2,72 @@ import express from "express";
 import cors from "cors";
 
 const app = express();
+const PORT = process.env.PORT || 10000;
+
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 3000;
-
 /**
- * 🧠 Simple in-memory state
+ * 🧠 PAMÄŤ LUMI
+ * (zatím len v RAM – neskôr DB)
  */
 const memory = {
-  mode: "default",
-  lastUserMessage: "",
-  lastLumiReply: ""
+  mode: "default", // default | coach
+  lastUserMessage: null,
+  lastLumiReply: null,
 };
 
 /**
- * Helpers
+ * 🤍 DEFAULT MÓD – prirodzený rozhovor
  */
 function replyDefault(message) {
   if (!memory.lastUserMessage) {
-    return `Ahoj 😊 Som LUMI. Ako sa dnes cítiš?`;
+    return "Ahoj 😊 Som LUMI. Ako sa dnes cítiš?";
   }
 
-  return `Rozumiem. Pred chvíľou si hovoril: "${memory.lastUserMessage}". Povedz mi viac.`;
-}
-
-function replyCoach(message) {
-  return `💪 Počujem ťa. Povedal si: "${message}".  
-Čo je **jedna malá vec**, ktorú vieš spraviť ešte dnes?`;
+  return `Rozumiem. Pred chvíľou si hovoril: "${memory.lastUserMessage}".  
+Čo sa odvtedy zmenilo?`;
 }
 
 /**
- * Root
+ * 💪 COACH MÓD – motivačný, priamy
  */
-app.get("/", (req, res) => {
-  res.send("LUMI backend is alive 🚀");
-});
+function replyCoach(message) {
+  if (!memory.lastUserMessage) {
+    return "💪 Som tvoj COACH. Čo ťa teraz najviac brzdí?";
+  }
+
+  return `Počujem ťa. Hovoril si: "${memory.lastUserMessage}".  
+Poďme to rozbiť na malé kroky. Čo je prvá vec, ktorú vieš spraviť hneď teraz?`;
+}
 
 /**
- * Chat endpoint
+ * 🚀 HLAVNÝ CHAT ENDPOINT
  */
 app.post("/chat", (req, res) => {
   const { message } = req.body;
 
   if (!message) {
-    return res.status(400).json({ error: "Missing message" });
+    return res.status(400).json({
+      from: "system",
+      reply: "❌ Chýba správa.",
+    });
   }
 
   let reply = "";
   let from = "LUMI_default";
 
-  // 🔁 MODE SWITCHING
+  // 🔀 PRÍKAZY
   if (message.startsWith("/coach")) {
     memory.mode = "coach";
     reply = "💛 OK. Prepínam sa do COACH módu. Poďme makať.";
     from = "system";
+  } else if (message.startsWith("/default")) {
+    memory.mode = "default";
+    reply = "🤍 OK. Späť do normálneho rozhovoru.";
+    from = "system";
   } else {
-    // 🧠 MODE LOGIC
+    // 🧠 Odpoveď podľa módu
     if (memory.mode === "coach") {
       reply = replyCoach(message);
       from = "LUMI_coach";
@@ -68,20 +77,27 @@ app.post("/chat", (req, res) => {
     }
   }
 
-  // 🧠 SAVE MEMORY
+  // 🧠 ULOŽIŤ PAMÄŤ AŽ PO VÝPOČTE ODPOVEDE
   memory.lastUserMessage = message;
   memory.lastLumiReply = reply;
 
   res.json({
     from,
     mode: memory.mode,
-    reply
+    reply,
   });
 });
 
 /**
- * Start server
+ * 🟢 HEALTH CHECK
  */
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🧠 LUMI server running on port ${PORT}`);
+app.get("/", (req, res) => {
+  res.send("✅ LUMI backend is running");
+});
+
+/**
+ * 🔊 START SERVER
+ */
+app.listen(PORT, () => {
+  console.log(`🚀 LUMI server running on port ${PORT}`);
 });
