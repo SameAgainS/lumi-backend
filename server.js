@@ -2,39 +2,86 @@ import express from "express";
 import cors from "cors";
 
 const app = express();
-const PORT = process.env.PORT || 10000;
 
 app.use(cors());
 app.use(express.json());
 
-/* ROOT TEST */
+/* =========================
+   ROOT ENDPOINT
+========================= */
 app.get("/", (req, res) => {
   res.send("LUMI backend is alive 🚀");
 });
 
-/* CHAT ENDPOINT */
-app.post("/chat", (req, res) => {
-  const text = (req.body.message || "").toLowerCase();
+/* =========================
+   SIMPLE INTELLIGENCE
+========================= */
+function analyzeMessage(message) {
+  const text = message.toLowerCase();
 
-  let reply = "Hm… povedz mi o tom viac.";
-
-  if (text.includes("ahoj") || text.includes("hello")) {
-    reply = "Ahoj 🙂 Som LUMI. Ako sa dnes máš?";
-  } 
-  else if (text.includes("ako sa máš")) {
-    reply = "Mám sa pokojne. Som tu pre teba. A ty?";
-  } 
-  else if (text.includes("pomoc")) {
-    reply = "Rada pomôžem 🌱 Čo práve riešiš?";
-  } 
-  else if (text.includes("ďakujem")) {
-    reply = "Rado sa stalo 🤍";
+  if (text.includes("ahoj") || text.includes("hello") || text.includes("čau")) {
+    return "greeting";
   }
 
-  res.json({ reply });
+  if (text.includes("?")) {
+    return "question";
+  }
+
+  if (
+    text.includes("smutný") ||
+    text.includes("zle") ||
+    text.includes("nahovno") ||
+    text.includes("unavený")
+  ) {
+    return "emotion";
+  }
+
+  return "default";
+}
+
+function generateReply(type, message) {
+  switch (type) {
+    case "greeting":
+      return "Ahoj 👋 som LUMI. Ako sa dnes cítiš?";
+
+    case "question":
+      return "Dobrá otázka 🤔 Skús mi ju trochu rozviesť.";
+
+    case "emotion":
+      return "To ma mrzí 😔 Chceš sa o tom porozprávať?";
+
+    default:
+      return `Rozumiem. Povedal si: "${message}"`;
+  }
+}
+
+/* =========================
+   CHAT ENDPOINT
+========================= */
+app.post("/chat", (req, res) => {
+  const { message } = req.body;
+
+  if (!message) {
+    return res.status(400).json({
+      error: "Missing message"
+    });
+  }
+
+  const type = analyzeMessage(message);
+  const reply = generateReply(type, message);
+
+  res.json({
+    from: "LUMI",
+    type,
+    reply
+  });
 });
 
-/* START SERVER */
-app.listen(PORT, () => {
-  console.log(`LUMI server running on port ${PORT}`);
+/* =========================
+   SERVER START
+========================= */
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🤖 LUMI server running on port ${PORT}`);
 });
