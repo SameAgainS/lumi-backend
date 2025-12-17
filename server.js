@@ -2,98 +2,86 @@ import express from "express";
 import cors from "cors";
 
 const app = express();
-
-/* ======================
-   BASIC MIDDLEWARE
-====================== */
 app.use(cors());
 app.use(express.json());
 
-/* ======================
-   STATE (LUMI MODE)
-====================== */
-let lumiMode = "default"; 
-// default | coach | friend
+const PORT = process.env.PORT || 3000;
 
-/* ======================
-   ROOT ENDPOINT
-====================== */
+/**
+ * 🧠 Simple in-memory state
+ */
+const memory = {
+  mode: "default",
+  lastUserMessage: "",
+  lastLumiReply: ""
+};
+
+/**
+ * Helpers
+ */
+function replyDefault(message) {
+  if (!memory.lastUserMessage) {
+    return `Ahoj 😊 Som LUMI. Ako sa dnes cítiš?`;
+  }
+
+  return `Rozumiem. Pred chvíľou si hovoril: "${memory.lastUserMessage}". Povedz mi viac.`;
+}
+
+function replyCoach(message) {
+  return `💪 Počujem ťa. Povedal si: "${message}".  
+Čo je **jedna malá vec**, ktorú vieš spraviť ešte dnes?`;
+}
+
+/**
+ * Root
+ */
 app.get("/", (req, res) => {
   res.send("LUMI backend is alive 🚀");
 });
 
-/* ======================
-   CHAT ENDPOINT
-====================== */
+/**
+ * Chat endpoint
+ */
 app.post("/chat", (req, res) => {
   const { message } = req.body;
 
   if (!message) {
-    return res.json({
-      from: "system",
-      reply: "⚠️ Pošli mi správu, prosím."
-    });
+    return res.status(400).json({ error: "Missing message" });
   }
-
-  /* =========
-     COMMANDS
-  ========= */
-
-  if (message.toLowerCase() === "/coach") {
-    lumiMode = "coach";
-    return res.json({
-      from: "system",
-      reply: "💪 OK. Prepínam sa do COACH módu. Poďme makať."
-    });
-  }
-
-  if (message.toLowerCase() === "/friend") {
-    lumiMode = "friend";
-    return res.json({
-      from: "system",
-      reply: "😊 Jasné. Som tu ako tvoj parťák."
-    });
-  }
-
-  if (message.toLowerCase() === "/default") {
-    lumiMode = "default";
-    return res.json({
-      from: "system",
-      reply: "🔄 Späť do normálneho módu."
-    });
-  }
-
-  /* =========
-     RESPONSES
-  ========= */
 
   let reply = "";
+  let from = "LUMI_default";
 
-  if (lumiMode === "coach") {
-    reply = `💡 Počujem ťa. Povedal si: "${message}".  
-Čo je momentálne tvoja najväčšia prekážka?`;
+  // 🔁 MODE SWITCHING
+  if (message.startsWith("/coach")) {
+    memory.mode = "coach";
+    reply = "💛 OK. Prepínam sa do COACH módu. Poďme makať.";
+    from = "system";
+  } else {
+    // 🧠 MODE LOGIC
+    if (memory.mode === "coach") {
+      reply = replyCoach(message);
+      from = "LUMI_coach";
+    } else {
+      reply = replyDefault(message);
+      from = "LUMI_default";
+    }
   }
 
-  else if (lumiMode === "friend") {
-    reply = `🙂 Hej, rozumiem. "${message}"  
-Som tu, kľudne mi povedz viac.`;
-  }
-
-  else {
-    reply = `🤍 Rozumiem. Povedal si: "${message}"`;
-  }
+  // 🧠 SAVE MEMORY
+  memory.lastUserMessage = message;
+  memory.lastLumiReply = reply;
 
   res.json({
-    from: `LUMI_${lumiMode}`,
+    from,
+    mode: memory.mode,
     reply
   });
 });
 
-/* ======================
-   SERVER START
-====================== */
-const PORT = process.env.PORT || 3000;
-
+/**
+ * Start server
+ */
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`LUMI server running on port ${PORT}`);
+  console.log(`🧠 LUMI server running on port ${PORT}`);
 });
