@@ -1,49 +1,62 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
   background: #111;
   color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   height: 100vh;
 }
 
+/* ZRUŠ VŠETKY OVERLAYE */
+*::before,
+*::after {
+  display: none !important;
+}
+
+/* HLAVNÝ CONTAINER */
 #chat-container {
+  position: relative;
   width: 400px;
   height: 500px;
-  border: 1px solid #444;
+  border: 2px solid red;
+  margin: 40px auto;
   display: flex;
   flex-direction: column;
+  pointer-events: auto;
 }
 
-#chat-header {
-  padding: 10px;
-  border-bottom: 1px solid #444;
-}
-
+/* CHAT */
 #chat-box {
   flex: 1;
   padding: 10px;
   overflow-y: auto;
+  pointer-events: auto;
 }
 
-.message {
-  margin-bottom: 10px;
-}
-
+/* INPUT AREA – TVRDÁ PRIORITA */
 #input-area {
   display: flex;
   padding: 10px;
-  border-top: 1px solid #444;
+  border-top: 2px solid red;
+  pointer-events: auto;
+  z-index: 9999;
 }
 
+/* INPUT – FORCE FOCUS */
 #user-input {
   flex: 1;
-  padding: 8px;
+  padding: 10px;
+  font-size: 16px;
+  pointer-events: auto;
+  user-select: text;
 }
 
 #send-btn {
-  padding: 8px;
+  padding: 10px;
+  margin-left: 5px;
+  pointer-events: auto;
 }
 
