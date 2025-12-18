@@ -1,60 +1,33 @@
+const chatBox = document.getElementById("chat-box");
 const input = document.getElementById("user-input");
-const btn = document.getElementById("send-btn");
-const chat = document.getElementById("chat-box");
-const langSwitch = document.getElementById("lang-switch");
+const sendBtn = document.getElementById("send-btn");
 
-let currentLang = "en";
+function addMessage(text, type) {
+  const msg = document.createElement("div");
+  msg.className = "message " + type;
+  msg.textContent = text;
+  chatBox.appendChild(msg);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
 
-const placeholders = {
-  en: "Write what came to mind…",
-  sk: "Napíš, čo ti napadlo…",
-  cz: "Napiš, co tě napadlo…"
-};
-
-langSwitch.addEventListener("change", () => {
-  currentLang = langSwitch.value;
-  input.placeholder = placeholders[currentLang];
-});
-
-async function send() {
+function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
 
-  // USER MESSAGE
-  const userMsg = document.createElement("div");
-  userMsg.className = "message user";
-  userMsg.textContent = text;
-  chat.appendChild(userMsg);
-
+  addMessage(text, "user");
   input.value = "";
 
-  // THINKING
-  const thinking = document.createElement("div");
-  thinking.className = "message lumi";
-  thinking.textContent = "…";
-  chat.appendChild(thinking);
-
-  try {
-    const res = await fetch("/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: text,
-        lang: currentLang
-      })
-    });
-
-    const data = await res.json();
-    thinking.textContent = data.reply;
-
-  } catch {
-    thinking.textContent = "I’m still here. Something just paused.";
-  }
-
-  chat.scrollTop = chat.scrollHeight;
+  // dočasná odpoveď LUMI (kým nenapojíme backend)
+  setTimeout(() => {
+    addMessage(
+      "I hear you. You don’t have to rush — say it in your own time.",
+      "lumi"
+    );
+  }, 600);
 }
 
-btn.onclick = send;
-input.addEventListener("keydown", e => {
-  if (e.key === "Enter") send();
+sendBtn.addEventListener("click", sendMessage);
+
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") sendMessage();
 });
