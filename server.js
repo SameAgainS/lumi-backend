@@ -1,72 +1,34 @@
 import express from "express";
-import bodyParser from "body-parser";
 import cors from "cors";
-import OpenAI from "openai";
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 
-// ===== MIDDLEWARE =====
 app.use(cors());
-app.use(bodyParser.json());
-app.use(express.static("public")); // 👈 frontend
+app.use(express.json());
 
-// ===== OPENAI =====
-console.log("🔥 SERVER.JS LOADED");
-console.log("OPENAI KEY EXISTS:", !!process.env.OPENAI_API_KEY);
+// 👉 SERVE FRONTEND
+app.use(express.static("public"));
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-// ===== MEMORY (simple session memory) =====
-const memory = [];
-
-// ===== HEALTH CHECK =====
-app.get("/", (req, res) => {
-  res.send("✅ LUMI backend is running");
-});
-
-// ===== CHAT ENDPOINT =====
+// 👉 CHAT ENDPOINT
 app.post("/chat", async (req, res) => {
-  try {
-    const { message } = req.body;
+  const userMessage = req.body.message;
 
-    if (!message) {
-      return res.status(400).json({ error: "No message provided" });
-    }
-
-    memory.push({ role: "user", content: message });
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: `
-You are LUMI.
-You are warm, witty, supportive and slightly playful.
-You speak Slovak naturally.
-You talk like a real friend.
-Never say you are an AI unless asked directly.
-          `,
-        },
-        ...memory,
-      ],
-    });
-
-    const reply = completion.choices[0].message.content;
-
-    memory.push({ role: "assistant", content: reply });
-
-    res.json({ reply });
-  } catch (err) {
-    console.error("❌ AI ERROR:", err);
-    res.status(500).json({ error: "AI error", details: err.message });
+  if (!userMessage) {
+    return res.status(400).json({ reply: "No message received." });
   }
+
+  // 🔮 LUMI odpoveď (zatim placeholder – AI už máš)
+  const reply = `LUMI: Počujem ťa → "${userMessage}"`;
+
+  res.json({ reply });
 });
 
-// ===== START SERVER =====
+// 👉 FALLBACK (nechytá sa, ak existuje index.html)
+app.get("*", (req, res) => {
+  res.sendFile(process.cwd() + "/public/index.html");
+});
+
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🚀 LUMI backend running on port ${PORT}`);
 });
