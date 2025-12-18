@@ -1,14 +1,14 @@
+/* ===== RESET ===== */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
-/* PAGE */
 body {
   margin: 0;
   height: 100vh;
-  font-family: Inter, system-ui, sans-serif;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   background: radial-gradient(circle at top, #1a1d3a, #090b16);
   display: flex;
   justify-content: center;
@@ -16,131 +16,141 @@ body {
   color: #eaeaf0;
 }
 
-/* CONTAINER */
+/* ===== CHAT CONTAINER ===== */
 #chat-container {
-  width: 420px;
-  height: 640px;
-  background: linear-gradient(180deg, #14162b, #0c0f1f);
-  border-radius: 26px;
-  box-shadow: 0 30px 90px rgba(0,0,0,.65);
+  width: 380px;
+  max-width: 95vw;
+  height: 600px;
+  background: rgba(20, 22, 45, 0.95);
+  border-radius: 18px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-/* HEADER */
+/* ===== HEADER ===== */
 #chat-header {
-  padding: 18px;
-  border-bottom: 1px solid rgba(255,255,255,.06);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.lumi-header {
+.header-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
 }
 
-.lumi-avatar {
-  width: 72px;
-  height: 72px;
+/* ===== AVATAR ===== */
+.avatar {
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   object-fit: cover;
+  box-shadow: 0 0 20px rgba(140, 120, 255, 0.45);
+  flex-shrink: 0;
 }
 
-.lumi-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.lumi-name {
-  font-size: 17px;
+/* ===== TITLE ===== */
+.title {
+  font-size: 18px;
   font-weight: 600;
-  letter-spacing: .18em;
-  color: #d6ccff;
+  letter-spacing: 0.5px;
 }
 
-.lumi-slogan span {
+.subtitle {
   font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: .14em;
-  opacity: .6;
+  line-height: 1.4;
+  opacity: 0.75;
+  max-width: 200px;
 }
 
-.lumi-slogan strong {
-  font-size: 12px;
-  letter-spacing: .24em;
-  color: #f0eaff;
+.subtitle b {
+  font-weight: 600;
+  opacity: 0.9;
 }
 
-/* LANGUAGE */
+/* ===== LANGUAGE SWITCH ===== */
 #lang-switch {
-  margin-top: 12px;
-  background: #1b1e3a;
-  color: white;
+  background: rgba(255, 255, 255, 0.08);
   border: none;
-  border-radius: 12px;
+  color: #fff;
   padding: 6px 10px;
+  border-radius: 8px;
   font-size: 12px;
+  cursor: pointer;
 }
 
-/* CHAT */
+/* ===== CHAT BOX ===== */
 #chat-box {
   flex: 1;
-  padding: 18px;
+  padding: 16px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  gap: 12px;
 }
 
-/* MESSAGES */
+/* ===== MESSAGES ===== */
 .message {
   max-width: 80%;
-  padding: 14px 16px;
-  border-radius: 18px;
-  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
   font-size: 14px;
+  line-height: 1.5;
 }
 
 .message.lumi {
-  background: linear-gradient(135deg, #7b6cff, #9a7cff);
-  color: #0b0d1a;
+  background: linear-gradient(135deg, #7f6bff, #9b8cff);
+  color: #0c0c14;
+  align-self: flex-start;
 }
 
 .message.user {
-  margin-left: auto;
-  background: rgba(123,108,255,.18);
-  color: white;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  align-self: flex-end;
 }
 
-/* INPUT */
+/* ===== INPUT AREA ===== */
 #input-area {
   display: flex;
-  gap: 12px;
-  padding: 16px;
-  border-top: 1px solid rgba(255,255,255,.06);
+  gap: 10px;
+  padding: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 #user-input {
   flex: 1;
-  background: #1b1e3a;
+  background: rgba(255, 255, 255, 0.08);
   border: none;
-  border-radius: 18px;
-  padding: 14px 16px;
-  color: white;
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: #fff;
   font-size: 14px;
   outline: none;
 }
 
 #user-input::placeholder {
-  color: #8a8fb3;
+  color: rgba(255, 255, 255, 0.45);
 }
 
+/* ===== SEND BUTTON ===== */
 #send-btn {
-  background: linear-gradient(135deg, #7b6cff, #9a7cff);
+  background: linear-gradient(135deg, #7f6bff, #9b8cff);
   border: none;
-  border-radius: 18px;
-  padding: 0 22px;
+  border-radius: 12px;
+  padding: 0 18px;
+  font-size: 14px;
   font-weight: 600;
+  color: #0c0c14;
   cursor: pointer;
-  color: #0b0d1a;
+}
+
+#send-btn:hover {
+  filter: brightness(1.1);
 }
