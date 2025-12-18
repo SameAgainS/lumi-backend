@@ -4,6 +4,7 @@
   box-sizing: border-box;
 }
 
+/* PAGE */
 body {
   margin: 0;
   height: 100vh;
@@ -15,7 +16,7 @@ body {
   color: #eaeaf0;
 }
 
-/* === CONTAINER === */
+/* CONTAINER */
 #chat-container {
   width: 420px;
   height: 620px;
@@ -27,24 +28,35 @@ body {
   overflow: hidden;
 }
 
-/* === HEADER === */
+/* HEADER */
 #chat-header {
-  padding: 20px;
+  padding: 18px;
   border-bottom: 1px solid rgba(255,255,255,.06);
 }
 
-.lumi-name {
-  font-size: 18px;
-  font-weight: 600;
-  color: #d6ccff;
-  letter-spacing: .12em;
+.lumi-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-.lumi-slogan {
-  margin-top: 6px;
+.lumi-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.lumi-text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+}
+
+.lumi-name {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  color: #d6ccff;
 }
 
 .lumi-slogan span {
@@ -60,7 +72,18 @@ body {
   color: #f0eaff;
 }
 
-/* === CHAT === */
+/* LANGUAGE SWITCH */
+#lang-switch {
+  margin-top: 10px;
+  background: #1b1e3a;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+/* CHAT */
 #chat-box {
   flex: 1;
   padding: 18px;
@@ -69,14 +92,13 @@ body {
   flex-direction: column;
 }
 
-/* === MESSAGES === */
+/* MESSAGES */
 .message {
   max-width: 80%;
   padding: 14px 16px;
   border-radius: 16px;
   margin-bottom: 12px;
   font-size: 14px;
-  line-height: 1.4;
 }
 
 .message.lumi {
@@ -87,10 +109,10 @@ body {
 .message.user {
   margin-left: auto;
   background: rgba(123,108,255,.18);
-  color: #fff;
+  color: white;
 }
 
-/* === INPUT === */
+/* INPUT */
 #input-area {
   display: flex;
   gap: 10px;
@@ -107,10 +129,6 @@ body {
   color: white;
   font-size: 14px;
   outline: none;
-}
-
-#user-input::placeholder {
-  color: #8a8fb3;
 }
 
 #send-btn {
