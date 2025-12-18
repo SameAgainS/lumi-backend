@@ -20,6 +20,7 @@ body {
    CHAT CONTAINER
 =============================== */
 #chat-container {
+  position: relative; /* 🔑 dôležité */
   width: 420px;
   max-width: 95%;
   height: 620px;
@@ -41,6 +42,7 @@ body {
   padding: 18px 20px;
   background: rgba(255,255,255,0.03);
   border-bottom: 1px solid rgba(255,255,255,0.06);
+  z-index: 2;
 }
 
 #chat-header img {
@@ -118,6 +120,8 @@ body {
    CHAT BOX
 =============================== */
 #chat-box {
+  position: relative;
+  z-index: 1; /* 🔑 pod inputom */
   flex: 1;
   padding: 22px;
   overflow-y: auto;
@@ -152,6 +156,8 @@ body {
    INPUT AREA
 =============================== */
 #input-area {
+  position: relative;
+  z-index: 10; /* 🔥 NAJDOLEŽITEJŠIE */
   display: flex;
   gap: 10px;
   padding: 16px;
