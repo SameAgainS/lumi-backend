@@ -1,62 +1,60 @@
-let currentLang = "en";
-
-const translations = {
-  en: {
-    slogan1: "Words need to be spoken",
-    slogan2: "ONLY THEN THEY GAIN MEANING",
-    placeholder: "Write a thought…",
-    hello: "Hello. Speak freely. I am listening."
-  },
-  sk: {
-    slogan1: "Slová musia byť vyslovené",
-    slogan2: "AŽ POTOM MAJÚ VÝZNAM",
-    placeholder: "Napíš myšlienku…",
-    hello: "Ahoj. Hovor slobodne. Počúvam."
-  },
-  cz: {
-    slogan1: "Slova musí být vyslovena",
-    slogan2: "TEPRVE PAK MAJÍ VÝZNAM",
-    placeholder: "Napiš myšlenku…",
-    hello: "Ahoj. Mluv svobodně. Naslouchám."
-  }
-};
-
 const input = document.getElementById("user-input");
 const btn = document.getElementById("send-btn");
 const chat = document.getElementById("chat-box");
 const langSwitch = document.getElementById("lang-switch");
 
-function setLanguage(lang) {
-  currentLang = lang;
+let currentLang = "en";
 
-  document.querySelectorAll("[data-i18n]").forEach(el => {
-    const key = el.dataset.i18n;
-    el.textContent = translations[lang][key];
-  });
+const placeholders = {
+  en: "Write what came to mind…",
+  sk: "Napíš, čo ti napadlo…",
+  cz: "Napiš, co tě napadlo…"
+};
 
-  input.placeholder = translations[lang].placeholder;
-}
-
-langSwitch.addEventListener("change", e => {
-  setLanguage(e.target.value);
+langSwitch.addEventListener("change", () => {
+  currentLang = langSwitch.value;
+  input.placeholder = placeholders[currentLang];
 });
 
-setLanguage("en");
-setTimeout(() => input.focus(), 200);
+async function send() {
+  const text = input.value.trim();
+  if (!text) return;
+
+  // USER MESSAGE
+  const userMsg = document.createElement("div");
+  userMsg.className = "message user";
+  userMsg.textContent = text;
+  chat.appendChild(userMsg);
+
+  input.value = "";
+
+  // THINKING
+  const thinking = document.createElement("div");
+  thinking.className = "message lumi";
+  thinking.textContent = "…";
+  chat.appendChild(thinking);
+
+  try {
+    const res = await fetch("/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: text,
+        lang: currentLang
+      })
+    });
+
+    const data = await res.json();
+    thinking.textContent = data.reply;
+
+  } catch {
+    thinking.textContent = "I’m still here. Something just paused.";
+  }
+
+  chat.scrollTop = chat.scrollHeight;
+}
 
 btn.onclick = send;
 input.addEventListener("keydown", e => {
   if (e.key === "Enter") send();
 });
-
-function send() {
-  if (!input.value.trim()) return;
-
-  const msg = document.createElement("div");
-  msg.className = "message user";
-  msg.textContent = input.value;
-  chat.appendChild(msg);
-
-  input.value = "";
-  input.focus();
-}
