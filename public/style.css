@@ -1,55 +1,47 @@
-/* ===============================
-   RESET + GLOBAL
-=============================== */
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-               Roboto, Inter, sans-serif;
-  background: linear-gradient(180deg, #0e1020, #0b0d1a);
-  color: #eaeaf0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: radial-gradient(circle at top, #1a1d3a, #090b16);
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  color: #eaeaf0;
 }
 
-/* ===============================
-   CHAT CONTAINER
-=============================== */
+/* CONTAINER */
 #chat-container {
   width: 420px;
   max-width: 95%;
   height: 620px;
   background: #12142a;
-  border-radius: 20px;
+  border-radius: 22px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 40px 100px rgba(0,0,0,0.75);
   overflow: hidden;
 }
 
-/* ===============================
-   HEADER
-=============================== */
+/* HEADER */
 #chat-header {
   display: flex;
   align-items: center;
-  gap: 18px;
-  padding: 18px 20px;
-  background: rgba(255, 255, 255, 0.03);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 16px;
+  padding: 18px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
 #chat-header img {
-  width: 68px;
-  height: 68px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   object-fit: cover;
-  box-shadow: 0 0 24px rgba(140, 120, 255, 0.6);
+  box-shadow: 0 0 28px rgba(140,120,255,0.6);
 }
 
 .lumi-text {
@@ -57,23 +49,21 @@ body {
   flex-direction: column;
 }
 
-/* ===============================
-   BRAND LOGO TEXT
-=============================== */
 .lumi-name {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 600;
-  color: #cbbcff;
-  margin-bottom: 2px;
+  color: #d6ccff;
 }
 
+/* BRAND LOGO TEXT */
 .lumi-brand {
+  margin-top: 2px;
   line-height: 1.15;
 }
 
 .brand-line-1 {
   font-size: 11px;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #9aa0ff;
   opacity: 0.7;
@@ -81,68 +71,61 @@ body {
 
 .brand-line-2 {
   font-size: 12px;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #e4ddff;
+  color: #f0eaff;
   font-weight: 600;
   margin-top: 2px;
 }
 
-/* ===============================
-   CHAT BOX
-=============================== */
+/* CHAT */
 #chat-box {
   flex: 1;
-  padding: 24px 20px;
+  padding: 22px;
   overflow-y: auto;
 }
 
-/* ===============================
-   MESSAGES
-=============================== */
+/* MESSAGES */
 .message {
   max-width: 85%;
-  padding: 12px 14px;
-  margin-bottom: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
   line-height: 1.45;
-  border-radius: 14px;
-  word-wrap: break-word;
+  margin-bottom: 14px;
   white-space: pre-wrap;
 }
 
 .message.lumi {
-  background: linear-gradient(135deg, #7c6cff, #9a7cff);
+  background: linear-gradient(135deg, #7c6cff, #9b7cff);
   color: #0f1020;
   border-bottom-left-radius: 6px;
 }
 
 .message.user {
   margin-left: auto;
-  background: rgba(120, 160, 255, 0.15);
-  color: #dfe6ff;
+  background: rgba(120,160,255,0.15);
+  color: #e2e6ff;
   border-bottom-right-radius: 6px;
 }
 
-/* ===============================
-   INPUT AREA
-=============================== */
+/* INPUT */
 #input-area {
   display: flex;
   gap: 10px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255,255,255,0.03);
+  border-top: 1px solid rgba(255,255,255,0.06);
 }
 
 #user-input {
   flex: 1;
-  padding: 14px 16px;
+  padding: 14px 18px;
   border-radius: 999px;
   border: none;
   outline: none;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255,255,255,0.07);
   color: white;
+  font-size: 14px;
 }
 
 #user-input::placeholder {
@@ -150,27 +133,20 @@ body {
 }
 
 #send-btn {
-  padding: 14px 20px;
+  padding: 14px 22px;
   border-radius: 999px;
   border: none;
-  background: linear-gradient(135deg, #7c6cff, #9a7cff);
+  background: linear-gradient(135deg, #7c6cff, #9b7cff);
   color: #0f1020;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.1s ease, opacity 0.1s ease;
-}
-
-#send-btn:hover {
-  opacity: 0.9;
 }
 
 #send-btn:active {
   transform: scale(0.97);
 }
 
-/* ===============================
-   MOBILE
-=============================== */
+/* MOBILE */
 @media (max-width: 480px) {
   #chat-container {
     width: 100%;
