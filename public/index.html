@@ -10,16 +10,14 @@
 
 <div id="chat-container">
 
+  <!-- HEADER -->
   <div id="chat-header">
-
-    <div class="lumi-header">
-      <img src="lumi.png" alt="LUMI avatar" class="lumi-avatar" />
-
-      <div class="lumi-text">
-        <div class="lumi-name">LUMI</div>
-        <div class="lumi-slogan">
-          <span data-i18n="slogan1">Words need to be spoken</span>
-          <strong data-i18n="slogan2">ONLY THEN THEY GAIN MEANING</strong>
+    <div class="header-left">
+      <img src="lumi.png" alt="LUMI" class="avatar" />
+      <div>
+        <div class="title">LUMI</div>
+        <div class="subtitle">
+          Words need to be spoken <b>only then they gain meaning</b>
         </div>
       </div>
     </div>
@@ -29,17 +27,23 @@
       <option value="sk">SK</option>
       <option value="cz">CZ</option>
     </select>
-
   </div>
 
+  <!-- CHAT -->
   <div id="chat-box">
-    <div class="message lumi" data-i18n="hello">
+    <div class="message lumi">
       Hello. Speak freely. I am listening.
     </div>
   </div>
 
+  <!-- INPUT -->
   <div id="input-area">
-    <input id="user-input" />
+    <input
+      id="user-input"
+      type="text"
+      placeholder="Write a thought…"
+      autocomplete="off"
+    />
     <button id="send-btn">Send</button>
   </div>
 
