@@ -1,12 +1,9 @@
-/* ===== HARD RESET PRO INTERACTION ===== */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
-  pointer-events: auto !important;
 }
 
-/* ===== PAGE ===== */
 body {
   margin: 0;
   height: 100vh;
@@ -18,69 +15,68 @@ body {
   color: #eaeaf0;
 }
 
-/* ===== CONTAINER ===== */
+/* === CONTAINER === */
 #chat-container {
-  position: relative;
-  z-index: 1;
   width: 420px;
   height: 620px;
   background: linear-gradient(180deg, #14162b, #0c0f1f);
-  border-radius: 22px;
+  border-radius: 24px;
   box-shadow: 0 30px 90px rgba(0,0,0,.65);
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-/* ===== HEADER ===== */
+/* === HEADER === */
 #chat-header {
-  padding: 18px 20px;
+  padding: 20px;
   border-bottom: 1px solid rgba(255,255,255,.06);
 }
 
 .lumi-name {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   color: #d6ccff;
+  letter-spacing: .12em;
 }
 
-.lumi-brand {
-  margin-top: 4px;
-  line-height: 1.15;
+.lumi-slogan {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.brand-line-1 {
+.lumi-slogan span {
   font-size: 11px;
+  text-transform: uppercase;
   letter-spacing: .14em;
-  text-transform: uppercase;
-  color: #9aa0ff;
-  opacity: .7;
+  opacity: .6;
 }
 
-.brand-line-2 {
+.lumi-slogan strong {
   font-size: 12px;
-  letter-spacing: .2em;
-  text-transform: uppercase;
+  letter-spacing: .22em;
   color: #f0eaff;
-  font-weight: 600;
 }
 
-/* ===== CHAT ===== */
+/* === CHAT === */
 #chat-box {
-  position: relative;
-  z-index: 1;
   flex: 1;
   padding: 18px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
-/* ===== MESSAGES ===== */
+/* === MESSAGES === */
 .message {
   max-width: 80%;
   padding: 14px 16px;
-  border-radius: 14px;
+  border-radius: 16px;
   margin-bottom: 12px;
   font-size: 14px;
+  line-height: 1.4;
 }
 
 .message.lumi {
@@ -94,34 +90,33 @@ body {
   color: #fff;
 }
 
-/* ===== INPUT AREA ===== */
+/* === INPUT === */
 #input-area {
-  position: relative;
-  z-index: 9999;
   display: flex;
   gap: 10px;
   padding: 16px;
   border-top: 1px solid rgba(255,255,255,.06);
 }
 
-/* ===== INPUT ===== */
 #user-input {
   flex: 1;
   background: #1b1e3a;
   border: none;
-  border-radius: 14px;
+  border-radius: 16px;
   padding: 14px 16px;
-  color: #fff;
+  color: white;
   font-size: 14px;
   outline: none;
-  caret-color: #fff;
 }
 
-/* ===== BUTTON ===== */
+#user-input::placeholder {
+  color: #8a8fb3;
+}
+
 #send-btn {
   background: linear-gradient(135deg, #7b6cff, #9a7cff);
   border: none;
-  border-radius: 14px;
+  border-radius: 16px;
   padding: 0 22px;
   font-weight: 600;
   cursor: pointer;

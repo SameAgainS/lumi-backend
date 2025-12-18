@@ -2,9 +2,7 @@ const input = document.getElementById("user-input");
 const btn = document.getElementById("send-btn");
 const chat = document.getElementById("chat-box");
 
-setTimeout(() => {
-  input.focus();
-}, 300);
+setTimeout(() => input.focus(), 200);
 
 btn.onclick = send;
 input.addEventListener("keydown", e => {
@@ -14,10 +12,10 @@ input.addEventListener("keydown", e => {
 function send() {
   if (!input.value.trim()) return;
 
-  const div = document.createElement("div");
-  div.className = "message user";
-  div.textContent = input.value;
-  chat.appendChild(div);
+  const userMsg = document.createElement("div");
+  userMsg.className = "message user";
+  userMsg.textContent = input.value;
+  chat.appendChild(userMsg);
 
   input.value = "";
   input.focus();
