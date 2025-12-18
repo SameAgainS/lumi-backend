@@ -1,62 +1,51 @@
 const chatBox = document.getElementById("chat-box");
 const input = document.getElementById("user-input");
 const sendBtn = document.getElementById("send-btn");
+const header = document.getElementById("chat-header");
 
-// ===== SESSION ID =====
-let sessionId = localStorage.getItem("lumi_session_id");
+let sessionId = localStorage.getItem("lumi_session");
 if (!sessionId) {
   sessionId = crypto.randomUUID();
-  localStorage.setItem("lumi_session_id", sessionId);
+  localStorage.setItem("lumi_session", sessionId);
 }
 
-function addMessage(text, className) {
+function addMessage(text, cls) {
   const div = document.createElement("div");
-  div.className = `message ${className}`;
+  div.className = "message " + cls;
   div.textContent = text;
   chatBox.appendChild(div);
   chatBox.scrollTop = chatBox.scrollHeight;
-  return div;
 }
 
 function addTyping() {
+  header.classList.add("thinking");
   const div = document.createElement("div");
   div.className = "message lumi typing";
   div.textContent = "LUMI píše…";
   chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
   return div;
 }
 
-sendBtn.addEventListener("click", sendMessage);
-input.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") sendMessage();
-});
+sendBtn.onclick = sendMessage;
+input.onkeypress = e => e.key === "Enter" && sendMessage();
 
 async function sendMessage() {
-  const message = input.value.trim();
-  if (!message) return;
+  const msg = input.value.trim();
+  if (!msg) return;
 
-  addMessage(message, "user");
+  addMessage(msg, "user");
   input.value = "";
 
-  const typingBubble = addTyping();
+  const typing = addTyping();
 
-  try {
-    const res = await fetch("/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message, sessionId })
-    });
+  const res = await fetch("/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: msg, sessionId })
+  });
 
-    const data = await res.json();
-
-    setTimeout(() => {
-      typingBubble.remove();
-      addMessage(data.reply, "lumi");
-    }, 600);
-
-  } catch (err) {
-    typingBubble.remove();
-    addMessage("LUMI má problém s pripojením 😕", "lumi");
-  }
+  const data = await res.json();
+  typing.remove();
+  header.classList.remove("thinking");
+  addMessage(data.reply, "lumi");
 }
