@@ -56,12 +56,17 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  width: 100%;
 }
 
 .brand-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  width: 100%;
+}
+
+.brand-spacer {
+  flex: 1; /* pushes logo to the right */
 }
 
 .title {
@@ -75,6 +80,8 @@ body {
   display: flex;
   align-items: center;
   height: 18px;
+  margin-top: 2px;
+  opacity: 0.9;
 }
 
 .mark-svg {
