@@ -1,7 +1,12 @@
-* {
+/* ===== HARD RESET PRO INTERACTION ===== */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+  pointer-events: auto !important;
 }
 
+/* ===== PAGE ===== */
 body {
   margin: 0;
   height: 100vh;
@@ -13,22 +18,24 @@ body {
   color: #eaeaf0;
 }
 
-/* CONTAINER */
+/* ===== CONTAINER ===== */
 #chat-container {
+  position: relative;
+  z-index: 1;
   width: 420px;
   height: 620px;
   background: linear-gradient(180deg, #14162b, #0c0f1f);
   border-radius: 22px;
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.65);
+  box-shadow: 0 30px 90px rgba(0,0,0,.65);
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-/* HEADER */
+/* ===== HEADER ===== */
 #chat-header {
   padding: 18px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,.06);
 }
 
 .lumi-name {
@@ -44,36 +51,36 @@ body {
 
 .brand-line-1 {
   font-size: 11px;
-  letter-spacing: 0.14em;
+  letter-spacing: .14em;
   text-transform: uppercase;
   color: #9aa0ff;
-  opacity: 0.7;
+  opacity: .7;
 }
 
 .brand-line-2 {
   font-size: 12px;
-  letter-spacing: 0.2em;
+  letter-spacing: .2em;
   text-transform: uppercase;
   color: #f0eaff;
   font-weight: 600;
-  margin-top: 2px;
 }
 
-/* CHAT */
+/* ===== CHAT ===== */
 #chat-box {
+  position: relative;
+  z-index: 1;
   flex: 1;
   padding: 18px;
   overflow-y: auto;
 }
 
-/* MESSAGES */
+/* ===== MESSAGES ===== */
 .message {
   max-width: 80%;
   padding: 14px 16px;
   border-radius: 14px;
   margin-bottom: 12px;
   font-size: 14px;
-  line-height: 1.4;
 }
 
 .message.lumi {
@@ -83,29 +90,34 @@ body {
 
 .message.user {
   margin-left: auto;
-  background: rgba(123,108,255,0.18);
-  color: #eaeaf0;
+  background: rgba(123,108,255,.18);
+  color: #fff;
 }
 
-/* INPUT */
+/* ===== INPUT AREA ===== */
 #input-area {
+  position: relative;
+  z-index: 9999;
   display: flex;
   gap: 10px;
   padding: 16px;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid rgba(255,255,255,.06);
 }
 
+/* ===== INPUT ===== */
 #user-input {
   flex: 1;
   background: #1b1e3a;
   border: none;
   border-radius: 14px;
   padding: 14px 16px;
-  color: white;
+  color: #fff;
   font-size: 14px;
   outline: none;
+  caret-color: #fff;
 }
 
+/* ===== BUTTON ===== */
 #send-btn {
   background: linear-gradient(135deg, #7b6cff, #9a7cff);
   border: none;
