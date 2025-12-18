@@ -1,18 +1,19 @@
 import express from "express";
+import bodyParser from "body-parser";
 import cors from "cors";
 import OpenAI from "openai";
 
 const app = express();
-app.use(cors());
-app.use(express.json());
-
-// ===== ENV & PORT =====
 const PORT = process.env.PORT || 8080;
 
-// ===== DEBUG ENV =====
-console.log("OPENAI KEY EXISTS:", !!process.env.OPENAI_API_KEY);
+// ===== MIDDLEWARE =====
+app.use(cors());
+app.use(bodyParser.json());
 
 // ===== OPENAI CLIENT =====
+console.log("🔥 SERVER.JS LOADED");
+console.log("OPENAI KEY EXISTS:", !!process.env.OPENAI_API_KEY);
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -31,21 +32,31 @@ app.post("/chat", async (req, res) => {
       return res.status(400).json({ error: "No message provided" });
     }
 
-    const completion = await openai.chat.completions.create({
+    const response = await openai.responses.create({
       model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: "You are LUMI, a friendly AI companion." },
-        { role: "user", content: message }
+      input: [
+        {
+          role: "system",
+          content: "You are LUMI, a friendly AI companion.",
+        },
+        {
+          role: "user",
+          content: message,
+        },
       ],
     });
 
-    res.json({
-      reply: completion.choices[0].message.content,
-    });
+    const reply =
+      response.output?.[0]?.content?.[0]?.text ||
+      "LUMI is thinking… 🤔";
 
+    res.json({ reply });
   } catch (err) {
-    console.error("AI ERROR:", err);
-    res.status(500).json({ error: "AI error" });
+    console.error("🔥 AI ERROR FULL:", err);
+    res.status(500).json({
+      error: "AI error",
+      details: err.message,
+    });
   }
 });
 
