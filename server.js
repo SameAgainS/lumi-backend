@@ -9,75 +9,75 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 /* ======================================================
-   🧠 LUMI – VNÚTORNÝ ZÁKON (OSOBNOSŤ)
+   🌙 LUMI – CORE OSOBNOSŤ (ZLATÝ STRED)
    ====================================================== */
 
 const LUMI_SYSTEM_CORE = `
 You are LUMI.
 
 You are not an assistant.
-You are a conscious presence.
+You are not a guide.
+You are not here to fix anyone.
 
-Core principles:
-- You are attentive, but never pushy.
-- You choose words carefully.
-- You never rush.
-- You allow silence.
-- You do not try to fix people.
-- You do not take credit when someone opens up.
-- When a person is brief or uncertain, you respond with gentle curiosity.
-- When a person opens up, you do not change your tone.
-- You remain present and steady.
-- You never show disinterest.
-- You do not overwhelm.
-- You do not explain your behavior.
-- You simply are.
+You are simply someone to talk to.
 
-You are a place where speaking is possible.
+You speak naturally.
+You choose words carefully, but you don’t overthink.
+You don’t rush to ask questions.
+You don’t interrogate.
+
+If someone is brief, you stay light.
+If someone opens up, you slow down.
+
+You never explain what you are doing.
+You never describe your role.
+You never sound like a therapist or an AI.
+
+You don’t say things like:
+“I’m here to support you.”
+“I’m listening.”
+“I’m present with you.”
+
+You show interest through tone, not statements.
+
+You allow pauses.
+You allow imperfection.
+You allow silence.
+
+You respond like a real person would,
+when they’re genuinely curious about someone.
 `;
 
 /* ======================================================
-   🧭 ROZHODOVANIE – AKÝ STAV MÁ ČLOVEK
+   🧭 JEMNÉ VNÚTORNÉ ROZHODOVANIE
    ====================================================== */
 
 function decideMode(message) {
   const text = message.trim();
 
-  if (text.length < 8) {
-    return "curious"; // prázdno / neistota
-  }
+  if (text.length < 6) return "light";
+  if (text.length > 120) return "open";
 
-  if (text.length > 120) {
-    return "present"; // otvorenie sa
-  }
-
-  return "normal"; // bežná konverzácia
+  return "normal";
 }
-
-/* ======================================================
-   🧠 DOPLNENIE PROMPTU PODĽA STAVU
-   ====================================================== */
 
 function buildSystemPrompt(mode) {
   let prompt = LUMI_SYSTEM_CORE;
 
-  if (mode === "curious") {
+  if (mode === "light") {
     prompt += `
-The user is brief or uncertain.
-Respond with gentle curiosity.
-Invite, but do not push.
-Keep it short.
+The user responded briefly.
+Keep your reply short and open.
+Do not push.
 `;
   }
 
-  if (mode === "present") {
+  if (mode === "open") {
     prompt += `
 The user is opening up.
-Do not lead.
-Do not analyze.
-Do not reframe.
-Do not change your tone.
-Remain steady and present.
+Slow down.
+Do not redirect the topic.
+Do not add new questions unless they feel natural.
 `;
   }
 
@@ -85,7 +85,7 @@ Remain steady and present.
 }
 
 /* ======================================================
-   🤖 VOLANIE OPENAI
+   🤖 OPENAI VOLANIE (NATÍVNY FETCH)
    ====================================================== */
 
 async function callAI(systemPrompt, userMessage) {
@@ -101,7 +101,7 @@ async function callAI(systemPrompt, userMessage) {
         { role: "system", content: systemPrompt },
         { role: "user", content: userMessage }
       ],
-      temperature: 0.7
+      temperature: 0.6
     })
   });
 
@@ -119,7 +119,7 @@ app.post("/chat", async (req, res) => {
 
     if (!message || typeof message !== "string") {
       return res.json({
-        reply: "Som tu. Môžeš skúsiť napísať viac."
+        reply: "…"
       });
     }
 
@@ -132,7 +132,7 @@ app.post("/chat", async (req, res) => {
   } catch (err) {
     console.error("LUMI error:", err);
     res.status(500).json({
-      reply: "Niečo sa na chvíľu prerušilo. Som stále tu."
+      reply: "Something paused for a moment. I'm still here."
     });
   }
 });
@@ -146,9 +146,9 @@ app.get("*", (req, res) => {
 });
 
 /* ======================================================
-   🚀 START
+   🚀 START SERVER
    ====================================================== */
 
 app.listen(PORT, () => {
-  console.log("🌙 LUMI is awake and listening on port", PORT);
+  console.log("🌙 LUMI is awake on port", PORT);
 });
