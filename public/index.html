@@ -8,15 +8,31 @@
 <body>
 
 <div id="chat-container">
-  <div id="chat-box"></div>
 
+  <!-- HEADER S TVÁROU LUMI -->
+  <div id="chat-header">
+    <img src="lumi-avatar.png" alt="LUMI avatar" />
+    <div>
+      <div class="lumi-name">LUMI</div>
+      <div class="lumi-status">online</div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="chat-box">
+    <div class="message lumi">
+      Ahoj 👋 Som LUMI. Ako sa dnes máš?
+    </div>
+  </div>
+
+  <!-- INPUT -->
   <div id="input-area">
     <input type="text" id="user-input" placeholder="Napíš LUMI..." />
     <button id="send-btn">Send</button>
   </div>
+
 </div>
 
 <script src="script.js"></script>
 </body>
 </html>
-
