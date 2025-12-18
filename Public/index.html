@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8" />
+  <title>LUMI</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f0f14;
+      color: #fff;
+    }
+    #chat {
+      max-width: 600px;
+      margin: 40px auto;
+    }
+    .msg {
+      margin: 10px 0;
+    }
+    .user {
+      color: #7dd3fc;
+    }
+    .lumi {
+      color: #a78bfa;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: none;
+    }
+    button {
+      background: #7c3aed;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="chat">
+    <h2>💜 LUMI</h2>
+    <div id="messages"></div>
+
+    <input id="input" placeholder="Napíš niečo LUMI…" />
+    <button onclick="send()">Odoslať</button>
+  </div>
+
+  <script>
+    async function send() {
+      const input = document.getElementById("input");
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      add("Ty", msg, "user");
+      input.value = "";
+
+      const res = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: msg })
+      });
+
+      const data = await res.json();
+      add("LUMI", data.reply, "lumi");
+    }
+
+    function add(who, text, cls) {
+      const div = document.createElement("div");
+      div.className = "msg " + cls;
+      div.innerHTML = `<b>${who}:</b> ${text}`;
+      document.getElementById("messages").appendChild(div);
+    }
+  </script>
+</body>
+</html>
