@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="sk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LUMI Chat</title>
+  <style>
+    body { font-family: system-ui, Arial; margin: 0; background: #0b0f14; color: #e8eef6; }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 16px; }
+    .card { background: #111826; border: 1px solid #1f2a3d; border-radius: 14px; padding: 14px; }
+    h1 { margin: 0 0 10px; font-size: 18px; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0; }
+    button { background: #1d4ed8; border: 0; color: white; padding: 10px 12px; border-radius: 10px; cursor: pointer; }
+    button.secondary { background: #243248; }
+    button:disabled { opacity: .6; cursor: not-allowed; }
+    .chat { height: 60vh; overflow: auto; padding: 12px; background: #0e1522; border-radius: 12px; border: 1px solid #1f2a3d; }
+    .msg { display: flex; margin: 10px 0; }
+    .bubble { max-width: 75%; padding: 10px 12px; border-radius: 14px; line-height: 1.35; white-space: pre-wrap; }
+    .me { justify-content: flex-end; }
+    .me .bubble { background: #1f3b66; border: 1px solid #2b4b7f; }
+    .bot .bubble { background: #132235; border: 1px solid #1f2a3d; }
+    .inputRow { display: flex; gap: 10px; margin-top: 10px; }
+    input { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #1f2a3d; background: #0e1522; color: #e8eef6; }
+    .hint { opacity: .75; font-size: 12px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>✨ LUMI – lokálny chat</h1>
+
+      <div class="row">
+        <button class="secondary" id="btnReset">/reset</button>
+        <button class="secondary" id="btnCoach">/coach</button>
+        <button class="secondary" id="btnBrutal">/style brutal</button>
+        <button class="secondary" id="btnNatural">/style natural</button>
+        <button class="secondary" id="btnWhoami">/whoami</button>
+      </div>
+
+      <div class="chat" id="chat"></div>
+
+      <div class="inputRow">
+        <input id="input" placeholder="Napíš niečo… (Enter odošle)" autocomplete="off" />
+        <button id="send">Send</button>
+      </div>
+
+      <div class="hint">
+        Backend: <code>http://localhost:3000</code>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "http://localhost:3000/chat";
+    const TYPE_SPEED = 22; // ⬅️ MENIŤ TU (nižšie = rýchlejšie)
+
+    const chatEl = document.getElementById("chat");
+    const inputEl = document.getElementById("input");
+    const sendBtn = document.getElementById("send");
+
+    const btnReset = document.getElementById("btnReset");
+    const btnCoach = document.getElementById("btnCoach");
+    const btnBrutal = document.getElementById("btnBrutal");
+    const btnNatural = document.getElementById("btnNatural");
+    const btnWhoami = document.getElementById("btnWhoami");
+
+    function addMessage(who, text = "") {
+      const wrap = document.createElement("div");
+      wrap.className = "msg " + (who === "me" ? "me" : "bot");
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = text;
+
+      wrap.appendChild(bubble);
+      chatEl.appendChild(wrap);
+      chatEl.scrollTop = chatEl.scrollHeight;
+
+      return bubble;
+    }
+
+    function typeText(element, text) {
+      let i = 0;
+      element.textContent = "";
+
+      const interval = setInterval(() => {
+        element.textContent += text[i];
+        chatEl.scrollTop = chatEl.scrollHeight;
+        i++;
+
+        if (i >= text.length) clearInterval(interval);
+      }, TYPE_SPEED);
+    }
+
+    function setBusy(busy) {
+      sendBtn.disabled = busy;
+      inputEl.disabled = busy;
+      btnReset.disabled = busy;
+      btnCoach.disabled = busy;
+      btnBrutal.disabled = busy;
+      btnNatural.disabled = busy;
+      btnWhoami.disabled = busy;
+    }
+
+    async function sendMessage(text) {
+      const trimmed = (text ?? "").trim();
+      if (!trimmed) return;
+
+      addMessage("me", trimmed);
+      inputEl.value = "";
+      setBusy(true);
+
+      try {
+        const r = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: trimmed })
+        });
+
+        const data = await r.json();
+
+        if (!r.ok) {
+          addMessage("bot", "⚠️ Error");
+        } else {
+          const bubble = addMessage("bot");
+          const reply = (data?.from ? data.from + ": " : "") + (data?.reply ?? "");
+          typeText(bubble, reply);
+        }
+      } catch (e) {
+        addMessage("bot", "⚠️ Backend nedostupný");
+      } finally {
+        setBusy(false);
+        inputEl.focus();
+      }
+    }
+
+    sendBtn.addEventListener("click", () => sendMessage(inputEl.value));
+    inputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage(inputEl.value);
+    });
+
+    btnReset.addEventListener("click", () => sendMessage("/reset"));
+    btnCoach.addEventListener("click", () => sendMessage("/coach"));
+    btnBrutal.addEventListener("click", () => sendMessage("/style brutal"));
+    btnNatural.addEventListener("click", () => sendMessage("/style natural"));
+    btnWhoami.addEventListener("click", () => sendMessage("/whoami"));
+
+    const hello = addMessage("bot");
+    typeText(hello, "LUMI: Ahoj. Napíš mi niečo 🙂");
+    inputEl.focus();
+  </script>
+</body>
+</html>
