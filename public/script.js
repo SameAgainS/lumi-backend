@@ -2,6 +2,13 @@
    LANGUAGE DATA
 ========================= */
 const LANG = {
+  en: {
+    brand1: "Words need to be spoken",
+    brand2: "Only then they gain meaning",
+    welcome: "Hello. What will words create today?",
+    placeholder: "Write a thought…",
+    send: "Send"
+  },
   sk: {
     brand1: "Slová chcú byť vyslovené",
     brand2: "Až potom majú význam",
@@ -15,26 +22,13 @@ const LANG = {
     welcome: "Ahoj. Co dnes vznikne slovy?",
     placeholder: "Napiš myšlenku…",
     send: "Send"
-  },
-  en: {
-    brand1: "Words need to be spoken",
-    brand2: "Only then they gain meaning",
-    welcome: "Hello. What will words create today?",
-    placeholder: "Write a thought…",
-    send: "Send"
   }
 };
 
 /* =========================
-   LANGUAGE DETECTION
+   DEFAULT LANGUAGE = EN
 ========================= */
-let currentLang = localStorage.getItem("lumi_lang");
-
-if (!currentLang) {
-  const browserLang = navigator.language.slice(0, 2);
-  currentLang = LANG[browserLang] ? browserLang : "en";
-  localStorage.setItem("lumi_lang", currentLang);
-}
+let currentLang = localStorage.getItem("lumi_lang") || "en";
 
 /* =========================
    APPLY LANGUAGE
@@ -45,12 +39,26 @@ function applyLanguage() {
   document.querySelector(".brand-line-1").textContent = t.brand1;
   document.querySelector(".brand-line-2").textContent = t.brand2;
   document.querySelector(".message.lumi").textContent = t.welcome;
-
   document.getElementById("user-input").placeholder = t.placeholder;
   document.getElementById("send-btn").textContent = t.send;
+
+  document.querySelectorAll("#lang-switch button").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.lang === currentLang);
+  });
 }
 
 applyLanguage();
+
+/* =========================
+   LANGUAGE SWITCH HANDLER
+========================= */
+document.querySelectorAll("#lang-switch button").forEach(btn => {
+  btn.onclick = () => {
+    currentLang = btn.dataset.lang;
+    localStorage.setItem("lumi_lang", currentLang);
+    applyLanguage();
+  };
+});
 
 /* =========================
    CHAT LOGIC

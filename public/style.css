@@ -1,3 +1,6 @@
+/* ===============================
+   RESET + GLOBAL
+=============================== */
 * {
   box-sizing: border-box;
 }
@@ -13,7 +16,9 @@ body {
   color: #eaeaf0;
 }
 
-/* CONTAINER */
+/* ===============================
+   CHAT CONTAINER
+=============================== */
 #chat-container {
   width: 420px;
   max-width: 95%;
@@ -26,12 +31,14 @@ body {
   overflow: hidden;
 }
 
-/* HEADER */
+/* ===============================
+   HEADER
+=============================== */
 #chat-header {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 18px;
+  gap: 18px;
+  padding: 18px 20px;
   background: rgba(255,255,255,0.03);
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
@@ -55,7 +62,9 @@ body {
   color: #d6ccff;
 }
 
-/* BRAND LOGO TEXT */
+/* ===============================
+   BRAND LOGO TEXT
+=============================== */
 .lumi-brand {
   margin-top: 2px;
   line-height: 1.15;
@@ -78,14 +87,45 @@ body {
   margin-top: 2px;
 }
 
-/* CHAT */
+/* ===============================
+   LANGUAGE SWITCH
+=============================== */
+#lang-switch {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+
+#lang-switch button {
+  background: rgba(255,255,255,0.08);
+  border: none;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 11px;
+  color: #cfcfff;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+#lang-switch button.active {
+  opacity: 1;
+  background: linear-gradient(135deg, #7c6cff, #9b7cff);
+  color: #0f1020;
+  font-weight: 600;
+}
+
+/* ===============================
+   CHAT BOX
+=============================== */
 #chat-box {
   flex: 1;
   padding: 22px;
   overflow-y: auto;
 }
 
-/* MESSAGES */
+/* ===============================
+   MESSAGES
+=============================== */
 .message {
   max-width: 85%;
   padding: 14px 16px;
@@ -108,7 +148,9 @@ body {
   border-bottom-right-radius: 6px;
 }
 
-/* INPUT */
+/* ===============================
+   INPUT AREA
+=============================== */
 #input-area {
   display: flex;
   gap: 10px;
@@ -146,7 +188,9 @@ body {
   transform: scale(0.97);
 }
 
-/* MOBILE */
+/* ===============================
+   MOBILE
+=============================== */
 @media (max-width: 480px) {
   #chat-container {
     width: 100%;
