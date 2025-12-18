@@ -2,28 +2,46 @@ const chatBox = document.getElementById("chat-box");
 const input = document.getElementById("user-input");
 const sendBtn = document.getElementById("send-btn");
 
-function addMessage(text, type) {
+let isSending = false;
+
+function addMessage(text, sender) {
   const msg = document.createElement("div");
-  msg.className = "message " + type;
-  msg.textContent = text;
+  msg.className = `message ${sender}`;
+  msg.innerText = text;
   chatBox.appendChild(msg);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-function sendMessage() {
+async function sendMessage() {
   const text = input.value.trim();
-  if (!text) return;
+  if (!text || isSending) return;
+
+  isSending = true;
 
   addMessage(text, "user");
   input.value = "";
 
-  // dočasná odpoveď LUMI (kým nenapojíme backend)
-  setTimeout(() => {
-    addMessage(
-      "I hear you. You don’t have to rush — say it in your own time.",
-      "lumi"
-    );
-  }, 600);
+  try {
+    const res = await fetch("/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
+    });
+
+    const data = await res.json();
+
+    if (data.reply) {
+      addMessage(data.reply, "lumi");
+    } else {
+      addMessage("…I didn’t quite catch that.", "lumi");
+    }
+
+  } catch (err) {
+    console.error(err);
+    addMessage("Something went quiet on my end.", "lumi");
+  }
+
+  isSending = false;
 }
 
 sendBtn.addEventListener("click", sendMessage);
