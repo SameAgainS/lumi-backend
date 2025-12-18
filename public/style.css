@@ -7,7 +7,8 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+               Roboto, Inter, sans-serif;
   background: linear-gradient(180deg, #0e1020, #0b0d1a);
   color: #eaeaf0;
   display: flex;
@@ -37,7 +38,7 @@ body {
 #chat-header {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 18px;
   padding: 18px 20px;
   background: rgba(255, 255, 255, 0.03);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
@@ -51,16 +52,40 @@ body {
   box-shadow: 0 0 24px rgba(140, 120, 255, 0.6);
 }
 
+.lumi-text {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===============================
+   BRAND LOGO TEXT
+=============================== */
 .lumi-name {
   font-size: 16px;
   font-weight: 600;
   color: #cbbcff;
+  margin-bottom: 2px;
 }
 
-.lumi-status {
-  font-size: 12px;
+.lumi-brand {
+  line-height: 1.15;
+}
+
+.brand-line-1 {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: #9aa0ff;
-  opacity: 0.8;
+  opacity: 0.7;
+}
+
+.brand-line-2 {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #e4ddff;
+  font-weight: 600;
+  margin-top: 2px;
 }
 
 /* ===============================
@@ -96,11 +121,6 @@ body {
   background: rgba(120, 160, 255, 0.15);
   color: #dfe6ff;
   border-bottom-right-radius: 6px;
-}
-
-.message.typing {
-  opacity: 0.6;
-  font-style: italic;
 }
 
 /* ===============================
