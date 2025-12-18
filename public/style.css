@@ -4,59 +4,102 @@
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #111;
-  color: white;
   height: 100vh;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: radial-gradient(circle at top, #1a1d3a, #090b16);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #eaeaf0;
 }
 
-/* ZRUŠ VŠETKY OVERLAYE */
-*::before,
-*::after {
-  display: none !important;
-}
-
-/* HLAVNÝ CONTAINER */
+/* === CHAT CONTAINER === */
 #chat-container {
-  position: relative;
-  width: 400px;
-  height: 500px;
-  border: 2px solid red;
-  margin: 40px auto;
+  width: 420px;
+  height: 620px;
+  background: linear-gradient(180deg, #14162b, #0c0f1f);
+  border-radius: 22px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.65);
   display: flex;
   flex-direction: column;
-  pointer-events: auto;
+  overflow: hidden;
 }
 
-/* CHAT */
+/* === HEADER === */
+#chat-header {
+  padding: 18px 20px;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #b9baff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* === CHAT AREA === */
 #chat-box {
   flex: 1;
-  padding: 10px;
+  padding: 18px;
   overflow-y: auto;
-  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
 }
 
-/* INPUT AREA – TVRDÁ PRIORITA */
+/* === MESSAGES === */
+.message {
+  background: linear-gradient(135deg, #7b6cff, #9a7cff);
+  color: #0b0d1a;
+  padding: 14px 16px;
+  border-radius: 14px;
+  max-width: 80%;
+  margin-bottom: 12px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* === INPUT AREA === */
 #input-area {
   display: flex;
-  padding: 10px;
-  border-top: 2px solid red;
-  pointer-events: auto;
-  z-index: 9999;
+  gap: 10px;
+  padding: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* INPUT – FORCE FOCUS */
+/* === INPUT === */
 #user-input {
   flex: 1;
-  padding: 10px;
-  font-size: 16px;
-  pointer-events: auto;
-  user-select: text;
+  background: #1b1e3a;
+  border: none;
+  border-radius: 14px;
+  padding: 14px 16px;
+  color: #ffffff;
+  font-size: 14px;
+  outline: none;
 }
 
+#user-input::placeholder {
+  color: #8a8fb3;
+}
+
+/* === BUTTON === */
 #send-btn {
-  padding: 10px;
-  margin-left: 5px;
-  pointer-events: auto;
+  background: linear-gradient(135deg, #7b6cff, #9a7cff);
+  border: none;
+  border-radius: 14px;
+  padding: 0 22px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  color: #0b0d1a;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+#send-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(123, 108, 255, 0.45);
+}
+
+#send-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
