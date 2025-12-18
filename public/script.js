@@ -1,3 +1,5 @@
+let currentLang = "en";
+
 const translations = {
   en: {
     slogan1: "Words need to be spoken",
@@ -25,6 +27,8 @@ const chat = document.getElementById("chat-box");
 const langSwitch = document.getElementById("lang-switch");
 
 function setLanguage(lang) {
+  currentLang = lang;
+
   document.querySelectorAll("[data-i18n]").forEach(el => {
     const key = el.dataset.i18n;
     el.textContent = translations[lang][key];
@@ -38,7 +42,6 @@ langSwitch.addEventListener("change", e => {
 });
 
 setLanguage("en");
-
 setTimeout(() => input.focus(), 200);
 
 btn.onclick = send;

@@ -19,9 +19,9 @@ body {
 /* CONTAINER */
 #chat-container {
   width: 420px;
-  height: 620px;
+  height: 640px;
   background: linear-gradient(180deg, #14162b, #0c0f1f);
-  border-radius: 24px;
+  border-radius: 26px;
   box-shadow: 0 30px 90px rgba(0,0,0,.65);
   display: flex;
   flex-direction: column;
@@ -37,12 +37,12 @@ body {
 .lumi-header {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
 }
 
 .lumi-avatar {
-  width: 48px;
-  height: 48px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -53,9 +53,9 @@ body {
 }
 
 .lumi-name {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 600;
-  letter-spacing: .14em;
+  letter-spacing: .18em;
   color: #d6ccff;
 }
 
@@ -68,17 +68,17 @@ body {
 
 .lumi-slogan strong {
   font-size: 12px;
-  letter-spacing: .22em;
+  letter-spacing: .24em;
   color: #f0eaff;
 }
 
-/* LANGUAGE SWITCH */
+/* LANGUAGE */
 #lang-switch {
-  margin-top: 10px;
+  margin-top: 12px;
   background: #1b1e3a;
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 6px 10px;
   font-size: 12px;
 }
@@ -96,7 +96,7 @@ body {
 .message {
   max-width: 80%;
   padding: 14px 16px;
-  border-radius: 16px;
+  border-radius: 18px;
   margin-bottom: 12px;
   font-size: 14px;
 }
@@ -115,7 +115,7 @@ body {
 /* INPUT */
 #input-area {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   padding: 16px;
   border-top: 1px solid rgba(255,255,255,.06);
 }
@@ -124,17 +124,21 @@ body {
   flex: 1;
   background: #1b1e3a;
   border: none;
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 14px 16px;
   color: white;
   font-size: 14px;
   outline: none;
 }
 
+#user-input::placeholder {
+  color: #8a8fb3;
+}
+
 #send-btn {
   background: linear-gradient(135deg, #7b6cff, #9a7cff);
   border: none;
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 0 22px;
   font-weight: 600;
   cursor: pointer;
