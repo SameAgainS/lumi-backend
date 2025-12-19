@@ -2,27 +2,65 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>LUMI — Your Digital Friend</title>
+  <title>LUMI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<div class="app">
-  <header class="header">
-    <div class="face">🌙</div>
-    <h1>LUMI</h1>
-    <p>Your Digital Friend</p>
-  </header>
+<div id="chat-container">
 
-  <main class="chat" id="chat">
-    <div class="msg lumi">Hi 👋 I’m LUMI. I’m here with you.</div>
-  </main>
+  <!-- HEADER -->
+  <div id="chat-header">
+    <div class="header-left">
 
-  <footer class="input-area">
-    <input id="input" placeholder="Write something…" />
-    <button id="send">Send</button>
-  </footer>
+      <img src="lumi.png" alt="LUMI" class="avatar" />
+
+      <div class="brand-block">
+        <div class="brand-row">
+          <div class="title">LUMI</div>
+
+          <!-- ABSTRACT LOGO C -->
+          <div class="mark">
+            <svg width="26" height="18" viewBox="0 0 26 18">
+              <path d="M2 14 C 8 8, 12 6, 18 4"
+                stroke="rgba(214,204,255,0.95)"
+                stroke-width="3"
+                stroke-linecap="round"
+                fill="none"/>
+              <path d="M17 4 C 14 6, 11 8, 9 10"
+                stroke="rgba(214,204,255,0.95)"
+                stroke-width="3"
+                stroke-linecap="round"
+                fill="none"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="subtitle">
+          Words want to be spoken.<br />
+          <b>Only then they begin to exist.</b>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="chat-box">
+    <div class="message lumi">
+      Hello… Something brought you here. I’m curious what it was.
+    </div>
+  </div>
+
+  <!-- INPUT -->
+  <div id="input-area">
+    <input id="user-input"
+           placeholder="Write what came to mind…"
+           autocomplete="off" />
+    <button id="send-btn">Send</button>
+  </div>
+
 </div>
 
 <script src="script.js"></script>

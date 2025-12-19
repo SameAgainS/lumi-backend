@@ -1,31 +1,51 @@
-const chat = document.getElementById("chat");
-const input = document.getElementById("input");
-const sendBtn = document.getElementById("send");
+const chatBox = document.getElementById("chat-box");
+const input = document.getElementById("user-input");
+const sendBtn = document.getElementById("send-btn");
 
-function add(text, sender) {
-  const div = document.createElement("div");
-  div.className = `msg ${sender}`;
-  div.textContent = text;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
+let isSending = false;
+
+function addMessage(text, sender) {
+  const msg = document.createElement("div");
+  msg.className = `message ${sender}`;
+  msg.innerText = text;
+  chatBox.appendChild(msg);
+  chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-async function send() {
+async function sendMessage() {
   const text = input.value.trim();
-  if (!text) return;
+  if (!text || isSending) return;
 
-  add(text, "user");
+  isSending = true;
+
+  addMessage(text, "user");
   input.value = "";
 
-  const res = await fetch("http://localhost:3000/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: text }),
-  });
+  try {
+    const res = await fetch("/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
+    });
 
-  const data = await res.json();
-  add(data.reply, "lumi");
+    const data = await res.json();
+
+    if (data.reply) {
+      addMessage(data.reply, "lumi");
+    } else {
+      addMessage("…I didn’t quite catch that.", "lumi");
+    }
+
+  } catch (err) {
+    console.error(err);
+    addMessage("Something went quiet on my end.", "lumi");
+  }
+
+  isSending = false;
 }
 
-sendBtn.onclick = send;
-input.addEventListener("keydown", e => e.key === "Enter" && send());
+sendBtn.addEventListener("click", sendMessage);
+
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") sendMessage();
+});
