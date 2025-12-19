@@ -89,40 +89,44 @@ Do not add new questions unless they feel natural.
 }
 
 /* ======================================================
-   🤖 OPENAI CALL – ODOLNÝ VOČI CHYBÁM
+   🤖 OPENAI CALL – MAXIMÁLNE ODOLNÝ
 ====================================================== */
 
 async function callAI(systemPrompt, userMessage) {
-  const response = await fetch(
-    "https://api.openai.com/v1/chat/completions",
-    {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userMessage }
-        ],
-        temperature: 0.6
-      })
-    }
-  );
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userMessage }
+      ],
+      temperature: 0.6
+    })
+  });
 
   const data = await response.json();
 
-  // 🔍 DEBUG – TERAZ UŽ VŽDY VIDÍŠ PRAVDU
+  // 🔍 ABSOLÚTNA PRAVDA – VIDÍŠ VŠETKO
   console.log("🔍 OPENAI RAW:", JSON.stringify(data, null, 2));
 
-  // 🛟 OCHRANA PROTI TICHÉMU PÁDU
-  if (!data.choices || !data.choices[0]?.message?.content) {
-    return "…I needed a second there. What were you saying?";
+  // 🧠 UNIVERZÁLNE ČÍTANIE ODPOVEDE
+  const text =
+    data?.choices?.[0]?.message?.content ??
+    data?.choices?.[0]?.message ??
+    data?.choices?.[0]?.text ??
+    data?.output_text ??
+    null;
+
+  if (!text) {
+    return "…I was there for a moment. Say that again?";
   }
 
-  return data.choices[0].message.content;
+  return text;
 }
 
 /* ======================================================
