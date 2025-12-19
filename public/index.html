@@ -30,13 +30,18 @@
     </main>
 
     <footer class="input-area">
-      <input id="input" placeholder="Write what came to mind…" />
-      <button id="send">Send</button>
+      <input
+        id="input"
+        placeholder="Write what came to mind..."
+        autocomplete="off"
+      />
+      <!-- 🔑 TYPE BUTTON JE KRITICKÉ -->
+      <button id="send" type="button">Send</button>
     </footer>
 
   </div>
 
-  <!-- 🔑 TOTO MUSÍ BYŤ ČISTÉ -->
+  <!-- JS sa MUSÍ načítať -->
   <script src="script.js"></script>
 </body>
 </html>

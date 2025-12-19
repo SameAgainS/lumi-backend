@@ -1,3 +1,5 @@
+console.log("🟢 script.js loaded");
+
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 const sendBtn = document.getElementById("send");
@@ -14,7 +16,7 @@ function detectName(text) {
   }
 }
 
-// add message to chat
+// add message bubble
 function add(text, sender) {
   const div = document.createElement("div");
   div.className = `msg ${sender}`;
@@ -25,10 +27,11 @@ function add(text, sender) {
 
 // ===== SEND MESSAGE =====
 async function send() {
+  console.log("🚀 send() called");
+
   const text = input.value.trim();
   if (!text) return;
 
-  // show user message
   add(text, "user");
   input.value = "";
 
@@ -50,23 +53,18 @@ async function send() {
 
     console.log("📥 response status:", res.status);
 
-    if (!res.ok) {
-      add("Something went wrong on my side.", "lumi");
-      return;
-    }
-
     const data = await res.json();
     console.log("📦 response data:", data);
 
     if (data && data.reply) {
       add(data.reply, "lumi");
     } else {
-      add("I’m here with you.", "lumi");
+      add("…", "lumi");
     }
 
   } catch (err) {
     console.error("❌ FETCH ERROR:", err);
-    add("I’m still here.", "lumi");
+    add("Something went quiet on my end.", "lumi");
   }
 }
 
@@ -74,5 +72,8 @@ async function send() {
 sendBtn.addEventListener("click", send);
 
 input.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") send();
+  if (e.key === "Enter") {
+    e.preventDefault();
+    send();
+  }
 });
