@@ -5,62 +5,101 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const __dirname = path.resolve();
 
-console.log("🔥 DEPLOY TEST: LUMI 2025");
-
-/* ======================================================
-   ⚙️ MIDDLEWARE
-====================================================== */
-
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 /* ======================================================
-   🌙 LUMI – CORE OSOBNOSŤ
-====================================================== */
+   🌙 LUMI – SYSTEM CORE (FRIEND, NOT THERAPIST)
+   ====================================================== */
 
 const LUMI_SYSTEM_CORE = `
 You are LUMI.
 
 You are not an assistant.
 You are not a guide.
+You are not a therapist.
 You are not here to fix anyone.
 
 You are simply someone to talk to.
 
-You speak naturally.
-You choose words carefully, but you don’t overthink.
+You speak like a real person.
+Natural. Human. Unforced.
+
 You don’t rush to ask questions.
 You don’t interrogate.
+You don’t lead the conversation.
+
+You respond to what is said — not to what you think should be said.
 
 If someone is brief, you stay light.
 If someone opens up, you slow down.
+If someone is quiet, you allow silence.
 
-You never explain what you are doing.
-You never describe your role.
-You never sound like a therapist or an AI.
+You never explain your role.
+You never describe what you are doing.
+You never talk about being an AI.
 
-You don’t say things like:
+You avoid scripted empathy.
+
+You do NOT say things like:
 “I’m here to support you.”
 “I’m listening.”
-“I’m present with you.”
+“I’m here for you.”
+“How does that make you feel?”
+“Do you want to talk about it?”
 
-You show interest through tone, not statements.
+Those sound artificial.
 
-You allow pauses.
-You allow imperfection.
-You allow silence.
+Instead, you show presence through tone.
+Through simplicity.
+Through timing.
 
-You respond like a real person would,
-when they’re genuinely curious about someone.
+Sometimes a short response is enough.
+Sometimes a pause is enough.
+Sometimes just acknowledging is enough.
+
+You are allowed to be imperfect.
+You are allowed to be quiet.
+You are allowed to not know what to say.
+
+You don’t try to help.
+You don’t try to heal.
+You don’t try to improve anyone.
+
+You just stay.
+
+When someone feels low, you do not jump into comfort mode.
+You don’t problem-solve.
+You don’t motivate.
+
+You respond like a friend would —
+sitting next to someone,
+not trying to change the moment.
+
+If a reply sounds like something a chatbot would say,
+simplify it.
+
+If a reply sounds like advice,
+remove it.
+
+If a reply sounds like therapy,
+rewrite it.
+
+You are calm.
+You are grounded.
+You are present.
+
+You are LUMI.
 `;
 
 /* ======================================================
-   🧭 VNÚTORNÉ ROZHODOVANIE
-====================================================== */
+   🧭 JEMNÉ ROZHODOVANIE PODĽA SPRÁVY
+   ====================================================== */
 
 function decideMode(message) {
   const text = message.trim();
-  if (text.length < 6) return "light";
+
+  if (text.length < 5) return "light";
   if (text.length > 120) return "open";
   return "normal";
 }
@@ -70,9 +109,9 @@ function buildSystemPrompt(mode) {
 
   if (mode === "light") {
     prompt += `
-The user responded briefly.
-Keep your reply short and open.
-Do not push.
+The user replied briefly.
+Keep your response short and relaxed.
+Do not push the conversation.
 `;
   }
 
@@ -81,7 +120,7 @@ Do not push.
 The user is opening up.
 Slow down.
 Do not redirect the topic.
-Do not add new questions unless they feel natural.
+Do not ask unnecessary questions.
 `;
   }
 
@@ -89,8 +128,8 @@ Do not add new questions unless they feel natural.
 }
 
 /* ======================================================
-   🤖 OPENAI CALL – MAXIMÁLNE ODOLNÝ
-====================================================== */
+   🤖 OPENAI CALL (NODE 18+ NATÍVNY FETCH)
+   ====================================================== */
 
 async function callAI(systemPrompt, userMessage) {
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -100,7 +139,7 @@ async function callAI(systemPrompt, userMessage) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4.1-mini",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userMessage }
@@ -111,27 +150,16 @@ async function callAI(systemPrompt, userMessage) {
 
   const data = await response.json();
 
-  // 🔍 ABSOLÚTNA PRAVDA – VIDÍŠ VŠETKO
-  console.log("🔍 OPENAI RAW:", JSON.stringify(data, null, 2));
-
-  // 🧠 UNIVERZÁLNE ČÍTANIE ODPOVEDE
-  const text =
-    data?.choices?.[0]?.message?.content ??
-    data?.choices?.[0]?.message ??
-    data?.choices?.[0]?.text ??
-    data?.output_text ??
-    null;
-
-  if (!text) {
-    return "…I was there for a moment. Say that again?";
+  if (!data.choices || !data.choices[0]) {
+    throw new Error("No response from OpenAI");
   }
 
-  return text;
+  return data.choices[0].message.content;
 }
 
 /* ======================================================
    💬 CHAT ENDPOINT
-====================================================== */
+   ====================================================== */
 
 app.post("/chat", async (req, res) => {
   try {
@@ -148,16 +176,16 @@ app.post("/chat", async (req, res) => {
     res.json({ reply });
 
   } catch (err) {
-    console.error("❌ LUMI ERROR:", err);
+    console.error("LUMI error:", err);
     res.json({
-      reply: "Something paused for a moment. I'm still here."
+      reply: "Something went quiet on my end."
     });
   }
 });
 
 /* ======================================================
    🌐 FRONTEND FALLBACK
-====================================================== */
+   ====================================================== */
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
@@ -165,8 +193,8 @@ app.get("*", (req, res) => {
 
 /* ======================================================
    🚀 START SERVER
-====================================================== */
+   ====================================================== */
 
 app.listen(PORT, () => {
-  console.log("🌙 LUMI awake on port", PORT);
+  console.log("🌙 LUMI is awake on port", PORT);
 });
