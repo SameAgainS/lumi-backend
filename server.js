@@ -14,9 +14,14 @@ app.use(express.static(path.join(__dirname, "public")));
 const PORT = process.env.PORT || 3000;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-// ===== MEMORY =====
-const memory = {};
+// =====================
+// 🧠 MEMORY (persistent per user name)
+// =====================
+const memory = {}; // userId -> [{ role, content }]
 
+// =====================
+// 🌙 LUMI COMPASS (SYSTEM MESSAGE)
+// =====================
 const SYSTEM_MESSAGE = {
   role: "system",
   content: `
@@ -29,18 +34,30 @@ You never rush.
 You do not repeat yourself.
 You respond based on context and previous messages.
 You are present, not mechanical.
+
+If the user is quiet, you stay with them without pressure.
 `
 };
 
+// =====================
+// 💬 CHAT ENDPOINT
+// =====================
 app.post("/chat", async (req, res) => {
   try {
     const { message, name } = req.body;
     const userId = name || "guest";
 
-    if (!memory[userId]) memory[userId] = [];
+    if (!memory[userId]) {
+      memory[userId] = [];
+    }
 
+    // store user message
     memory[userId].push({ role: "user", content: message });
-    if (memory[userId].length > 8) memory[userId].shift();
+
+    // limit memory size
+    if (memory[userId].length > 8) {
+      memory[userId].shift();
+    }
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -56,22 +73,36 @@ app.post("/chat", async (req, res) => {
     });
 
     const data = await response.json();
-    const reply =
-      data?.choices?.[0]?.message?.content || "I’m here with you.";
 
+    // =====================
+    // 🔐 SAFE RESPONSE PARSING
+    // =====================
+    let reply = "I’m here with you.";
+
+    if (data && Array.isArray(data.choices) && data.choices.length > 0) {
+      reply = data.choices[0]?.message?.content || reply;
+    }
+
+    // store assistant reply
     memory[userId].push({ role: "assistant", content: reply });
 
     res.json({ reply });
   } catch (err) {
-    console.error(err);
+    console.error("CHAT ERROR:", err);
     res.json({ reply: "I’m still here." });
   }
 });
 
+// =====================
+// 🌐 FRONTEND FALLBACK
+// =====================
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
+// =====================
+// 🚀 START SERVER
+// =====================
 app.listen(PORT, () => {
   console.log(`🧠 LUMI running on port ${PORT}`);
 });
