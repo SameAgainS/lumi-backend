@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 /* ======================================================
-   🌙 LUMI – CORE OSOBNOSŤ (UZAMKNUTÁ)
+   🌙 LUMI – CORE OSOBNOSŤ (STABILNÁ)
    ====================================================== */
 
 const LUMI_SYSTEM_CORE = `
@@ -49,7 +49,7 @@ when they’re genuinely curious about someone.
 `;
 
 /* ======================================================
-   🧭 JEMNÉ VNÚTORNÉ ROZHODOVANIE
+   🧭 VNÚTORNÝ KOMPAS
    ====================================================== */
 
 function decideMode(message) {
@@ -83,32 +83,7 @@ Do not add questions unless they feel natural.
 }
 
 /* ======================================================
-   🧰 ROBUSTNÉ VYŤAHOVANIE TEXTU
-   ====================================================== */
-
-function extractText(data) {
-  if (typeof data?.output_text === "string" && data.output_text.trim()) {
-    return data.output_text.trim();
-  }
-
-  if (Array.isArray(data?.output)) {
-    const collected = [];
-    for (const item of data.output) {
-      if (!Array.isArray(item?.content)) continue;
-      for (const c of item.content) {
-        if (typeof c?.text === "string" && c.text.trim()) {
-          collected.push(c.text.trim());
-        }
-      }
-    }
-    if (collected.length) return collected.join("\n");
-  }
-
-  return "";
-}
-
-/* ======================================================
-   🤖 OPENAI – RESPONSES API
+   🤖 OPENAI – CHAT COMPLETIONS (ISTOTA)
    ====================================================== */
 
 async function callAI(systemPrompt, userMessage) {
@@ -116,31 +91,32 @@ async function callAI(systemPrompt, userMessage) {
     throw new Error("OPENAI_API_KEY missing");
   }
 
-  const res = await fetch("https://api.openai.com/v1/responses", {
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      "Content-Type": "application/json",
+      "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+      "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      model: "gpt-4.1-mini",
-      input: [
+      model: "gpt-4o-mini",
+      messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: userMessage },
+        { role: "user", content: userMessage }
       ],
-      temperature: 0.6,
-    }),
+      temperature: 0.6
+    })
   });
 
   if (!res.ok) {
-    // nech LUMI nemlčí ani pri výpadku
-    return "Hmm… give me a second. I’m still here.";
+    throw new Error("OpenAI request failed");
   }
 
   const data = await res.json();
-  const text = extractText(data);
 
-  return text || "Hmm… give me a second. I’m still here.";
+  return (
+    data?.choices?.[0]?.message?.content ||
+    "Hmm… I’m still here."
+  );
 }
 
 /* ======================================================
@@ -150,6 +126,7 @@ async function callAI(systemPrompt, userMessage) {
 app.post("/chat", async (req, res) => {
   try {
     const { message } = req.body;
+
     if (!message || typeof message !== "string") {
       return res.json({ reply: "…" });
     }
@@ -159,9 +136,9 @@ app.post("/chat", async (req, res) => {
     const reply = await callAI(systemPrompt, message);
 
     res.json({ reply });
-  } catch {
+  } catch (err) {
     res.json({
-      reply: "Something slowed down for a moment. I’m here though.",
+      reply: "Something slowed down for a moment. I’m here though."
     });
   }
 });
