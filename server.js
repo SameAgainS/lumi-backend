@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 /* ======================================================
-   🌙 LUMI – CORE OSOBNOSŤ (ZLATÝ STRED)
+   🌙 LUMI – CORE OSOBNOSŤ (UZAMKNUTÁ)
    ====================================================== */
 
 const LUMI_SYSTEM_CORE = `
@@ -29,7 +29,7 @@ You don’t interrogate.
 If someone is brief, you stay light.
 If someone opens up, you slow down.
 
-You never explain what you are doing.
+You never explain what you are.
 You never describe your role.
 You never sound like a therapist or an AI.
 
@@ -53,9 +53,9 @@ when they’re genuinely curious about someone.
    ====================================================== */
 
 function decideMode(message) {
-  const text = message.trim();
-  if (text.length < 6) return "light";
-  if (text.length > 120) return "open";
+  const t = message.trim();
+  if (t.length < 6) return "light";
+  if (t.length > 120) return "open";
   return "normal";
 }
 
@@ -64,7 +64,7 @@ function buildSystemPrompt(mode) {
 
   if (mode === "light") {
     prompt += `
-The user responded briefly.
+The user was brief.
 Keep your reply short and open.
 Do not push.
 `;
@@ -75,7 +75,7 @@ Do not push.
 The user is opening up.
 Slow down.
 Do not redirect the topic.
-Do not add new questions unless they feel natural.
+Do not add questions unless they feel natural.
 `;
   }
 
@@ -83,85 +83,66 @@ Do not add new questions unless they feel natural.
 }
 
 /* ======================================================
-   🧰 Helper: vytiahni text z Responses API rôznych tvarov
+   🧰 ROBUSTNÉ VYŤAHOVANIE TEXTU (KĽÚČOVÉ)
    ====================================================== */
 
-function extractResponseText(data) {
-  // 1) najčastejšie: output_text
+function extractText(data) {
   if (typeof data?.output_text === "string" && data.output_text.trim()) {
     return data.output_text.trim();
   }
 
-  // 2) output array -> content array -> položky s textom
-  const out = data?.output;
-  if (Array.isArray(out)) {
-    const parts = [];
+  if (Array.isArray(data?.output)) {
+    const collected = [];
 
-    for (const item of out) {
-      const content = item?.content;
-      if (!Array.isArray(content)) continue;
+    for (const item of data.output) {
+      if (!Array.isArray(item?.content)) continue;
 
-      for (const c of content) {
-        // býva { type: "output_text", text: "..." }
+      for (const c of item.content) {
         if (typeof c?.text === "string" && c.text.trim()) {
-          parts.push(c.text.trim());
-        }
-        // niekedy je text zabalený inak
-        if (typeof c?.content === "string" && c.content.trim()) {
-          parts.push(c.content.trim());
+          collected.push(c.text.trim());
         }
       }
     }
 
-    if (parts.length) return parts.join("\n");
-  }
-
-  // 3) fallbacky (niekedy)
-  if (typeof data?.text === "string" && data.text.trim()) {
-    return data.text.trim();
+    if (collected.length) return collected.join("\n");
   }
 
   return "";
 }
 
 /* ======================================================
-   🤖 OPENAI VOLANIE (RESPONSES API)
+   🤖 OPENAI – RESPONSES API (STABILNÉ)
    ====================================================== */
 
 async function callAI(systemPrompt, userMessage) {
-  const response = await fetch("https://api.openai.com/v1/responses", {
+  const res = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      "Content-Type": "application/json",
+      "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+      "Content-Type": "application/json"
     },
     body: JSON.stringify({
       model: "gpt-4.1-mini",
       input: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: userMessage },
+        { role: "user", content: userMessage }
       ],
-      temperature: 0.6,
-    }),
+      temperature: 0.6
+    })
   });
 
-  const data = await response.json();
-
-  // ✅ Debug: uvidíš pravdu v Railway Logs (bez hádania)
-  console.log("📡 OpenAI status:", response.status);
-  console.log("📦 OpenAI response:", JSON.stringify(data, null, 2));
-
-  // Ak OpenAI vráti error, nech to vidíš
-  if (!response.ok) {
-    const msg =
-      data?.error?.message ||
-      data?.message ||
-      "OpenAI request failed (unknown).";
-    throw new Error(msg);
+  if (!res.ok) {
+    throw new Error("OpenAI request failed");
   }
 
-  const text = extractResponseText(data);
-  return text || "…";
+  const data = await res.json();
+  const text = extractText(data);
+
+  // 🔒 ABSOLÚTNY FAILSAFE
+  return (
+    text ||
+    "Hmm… give me a second. I’m still here."
+  );
 }
 
 /* ======================================================
@@ -182,9 +163,8 @@ app.post("/chat", async (req, res) => {
 
     res.json({ reply });
   } catch (err) {
-    console.error("❌ LUMI error:", err?.message || err);
-    res.status(500).json({
-      reply: "Something paused for a moment. I'm still here.",
+    res.json({
+      reply: "Something slowed down for a moment. I’m here though."
     });
   }
 });
@@ -198,7 +178,7 @@ app.get("*", (req, res) => {
 });
 
 /* ======================================================
-   🚀 START SERVER
+   🚀 START
    ====================================================== */
 
 app.listen(PORT, () => {
