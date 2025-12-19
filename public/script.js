@@ -1,51 +1,50 @@
-const chatBox = document.getElementById("chat-box");
-const input = document.getElementById("user-input");
-const sendBtn = document.getElementById("send-btn");
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+const sendBtn = document.getElementById("send");
 
-let isSending = false;
+// persistent identity
+let userName = localStorage.getItem("lumi_name");
 
-function addMessage(text, sender) {
-  const msg = document.createElement("div");
-  msg.className = `message ${sender}`;
-  msg.innerText = text;
-  chatBox.appendChild(msg);
-  chatBox.scrollTop = chatBox.scrollHeight;
+// detect name
+function detectName(text) {
+  const match = text.match(/i[' ]?m ([a-z]+)/i);
+  if (match) {
+    userName = match[1];
+    localStorage.setItem("lumi_name", userName);
+  }
 }
 
-async function sendMessage() {
+function add(text, sender) {
+  const div = document.createElement("div");
+  div.className = `msg ${sender}`;
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+async function send() {
   const text = input.value.trim();
-  if (!text || isSending) return;
+  if (!text) return;
 
-  isSending = true;
-
-  addMessage(text, "user");
+  add(text, "user");
   input.value = "";
 
-  try {
-    const res = await fetch("/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
-    });
+  detectName(text);
 
-    const data = await res.json();
+  const res = await fetch("/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: text,
+      name: userName
+    })
+  });
 
-    if (data.reply) {
-      addMessage(data.reply, "lumi");
-    } else {
-      addMessage("…I didn’t quite catch that.", "lumi");
-    }
-
-  } catch (err) {
-    console.error(err);
-    addMessage("Something went quiet on my end.", "lumi");
-  }
-
-  isSending = false;
+  const data = await res.json();
+  add(data.reply, "lumi");
 }
 
-sendBtn.addEventListener("click", sendMessage);
-
-input.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") sendMessage();
+sendBtn.onclick = send;
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") send();
 });
