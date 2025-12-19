@@ -1,3 +1,4 @@
+console.log("🔥 DEPLOY TEST: LUMI 2025");
 import express from "express";
 import path from "path";
 
