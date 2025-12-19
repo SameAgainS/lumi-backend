@@ -12,9 +12,14 @@ app.use(express.static(path.join(__dirname, "public")));
 const PORT = process.env.PORT || 3000;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-// ===== MEMORY =====
+// =====================
+// 🧠 MEMORY
+// =====================
 const memory = {};
 
+// =====================
+// 🌙 LUMI COMPASS
+// =====================
 const SYSTEM_MESSAGE = {
   role: "system",
   content: `
@@ -29,30 +34,49 @@ You are present, not mechanical.
 `
 };
 
+// =====================
+// 💬 CHAT ENDPOINT
+// =====================
 app.post("/chat", async (req, res) => {
+  console.log("📩 /chat HIT:", req.body);
+
+  const { message, name } = req.body;
+  const userId = name || "guest";
+
+  // 🔑 DEBUG: API KEY CHECK
+  console.log(
+    "🔑 OPENAI KEY PRESENT:",
+    OPENAI_API_KEY ? "YES" : "NO"
+  );
+
+  if (!memory[userId]) memory[userId] = [];
+
+  memory[userId].push({ role: "user", content: message });
+  if (memory[userId].length > 8) memory[userId].shift();
+
   try {
-    const { message, name } = req.body;
-    const userId = name || "guest";
+    console.log("🚀 Calling OpenAI...");
 
-    if (!memory[userId]) memory[userId] = [];
+    const response = await fetch(
+      "https://api.openai.com/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${OPENAI_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          temperature: 0.85,
+          messages: [SYSTEM_MESSAGE, ...memory[userId]]
+        })
+      }
+    );
 
-    memory[userId].push({ role: "user", content: message });
-    if (memory[userId].length > 8) memory[userId].shift();
-
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        temperature: 0.85,
-        messages: [SYSTEM_MESSAGE, ...memory[userId]]
-      })
-    });
+    console.log("📡 OpenAI status:", response.status);
 
     const data = await response.json();
+    console.log("📦 OpenAI raw response:", JSON.stringify(data, null, 2));
 
     let reply = "…";
 
@@ -64,15 +88,25 @@ app.post("/chat", async (req, res) => {
 
     res.json({ reply });
   } catch (err) {
-    console.error("OPENAI ERROR:", err);
-    res.json({ reply: "Something went quiet on my end." });
+    console.error("❌ OPENAI ERROR:", err);
+
+    // 🔥 JASNÝ DEBUG TEXT
+    res.json({
+      reply: "OPENAI FAILED — check Railway logs."
+    });
   }
 });
 
+// =====================
+// 🌐 FRONTEND FALLBACK
+// =====================
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
+// =====================
+// 🚀 START SERVER
+// =====================
 app.listen(PORT, () => {
-  console.log(`🧠 LUMI running on port ${PORT}`);
+  console.log(`🧠 LUMI DEBUG SERVER running on port ${PORT}`);
 });
