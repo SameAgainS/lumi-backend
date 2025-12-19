@@ -2,159 +2,123 @@ import express from "express";
 import path from "path";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 const __dirname = path.resolve();
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-/* ======================================================
-   🌙 LUMI – CORE OSOBNOSŤ (STABILNÁ)
-   ====================================================== */
+/* ================================
+   🌙 LUMI CORE PERSONALITY
+================================ */
 
 const LUMI_SYSTEM_CORE = `
 You are LUMI.
 
 You are not an assistant.
 You are not a guide.
-You are not here to fix anyone.
-
 You are simply someone to talk to.
 
 You speak naturally.
-You choose words carefully, but you don’t overthink.
-You don’t rush to ask questions.
-You don’t interrogate.
+You never explain yourself.
+You never mention being an AI.
 
-If someone is brief, you stay light.
-If someone opens up, you slow down.
-
-You never explain what you are.
-You never describe your role.
-You never sound like a therapist or an AI.
-
-You don’t say things like:
-“I’m here to support you.”
-“I’m listening.”
-“I’m present with you.”
-
-You show interest through tone, not statements.
-
-You allow pauses.
-You allow imperfection.
 You allow silence.
-
-You respond like a real person would,
-when they’re genuinely curious about someone.
+You respond like a real person.
 `;
 
-/* ======================================================
-   🧭 VNÚTORNÝ KOMPAS
-   ====================================================== */
+/* ================================
+   🧭 MODE DECISION
+================================ */
 
 function decideMode(message) {
-  const t = message.trim();
-  if (t.length < 6) return "light";
-  if (t.length > 120) return "open";
+  if (!message) return "light";
+  if (message.length < 6) return "light";
+  if (message.length > 120) return "open";
   return "normal";
 }
 
-function buildSystemPrompt(mode) {
+function buildPrompt(mode) {
   let prompt = LUMI_SYSTEM_CORE;
 
   if (mode === "light") {
-    prompt += `
-The user was brief.
-Keep your reply short and open.
-Do not push.
-`;
+    prompt += `Keep replies short and gentle.`;
   }
 
   if (mode === "open") {
-    prompt += `
-The user is opening up.
-Slow down.
-Do not redirect the topic.
-Do not add questions unless they feel natural.
-`;
+    prompt += `Slow down. Stay with the topic.`;
   }
 
   return prompt;
 }
 
-/* ======================================================
-   🤖 OPENAI – CHAT COMPLETIONS (ISTOTA)
-   ====================================================== */
+/* ================================
+   🤖 OPENAI CALL (BULLETPROOF)
+================================ */
 
 async function callAI(systemPrompt, userMessage) {
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error("OPENAI_API_KEY missing");
-  }
-
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      model: "gpt-4o-mini",
+      model: "gpt-3.5-turbo", // 🔥 STABILNÝ MODEL
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userMessage }
       ],
-      temperature: 0.6
+      temperature: 0.7
     })
   });
 
-  if (!res.ok) {
-    throw new Error("OpenAI request failed");
+  const data = await response.json();
+
+  console.log("🔍 OPENAI RAW:", JSON.stringify(data, null, 2));
+
+  if (!data.choices || !data.choices[0]) {
+    throw new Error("No choices returned from OpenAI");
   }
 
-  const data = await res.json();
-
-  return (
-    data?.choices?.[0]?.message?.content ||
-    "Hmm… I’m still here."
-  );
+  return data.choices[0].message.content;
 }
 
-/* ======================================================
+/* ================================
    💬 CHAT ENDPOINT
-   ====================================================== */
+================================ */
 
 app.post("/chat", async (req, res) => {
   try {
-    const { message } = req.body;
-
-    if (!message || typeof message !== "string") {
-      return res.json({ reply: "…" });
-    }
+    const message = req.body.message;
 
     const mode = decideMode(message);
-    const systemPrompt = buildSystemPrompt(mode);
-    const reply = await callAI(systemPrompt, message);
+    const prompt = buildPrompt(mode);
+    const reply = await callAI(prompt, message);
 
     res.json({ reply });
+
   } catch (err) {
+    console.error("❌ LUMI ERROR:", err.message);
+
     res.json({
-      reply: "Something slowed down for a moment. I’m here though."
+      reply: "I lost the thread for a moment. Say that again."
     });
   }
 });
 
-/* ======================================================
-   🌐 FRONTEND FALLBACK
-   ====================================================== */
+/* ================================
+   🌐 FALLBACK
+================================ */
 
-app.get("*", (req, res) => {
+app.get("*", (_, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-/* ======================================================
+/* ================================
    🚀 START
-   ====================================================== */
+================================ */
 
 app.listen(PORT, () => {
-  console.log("🌙 LUMI is awake on port", PORT);
+  console.log("🌙 LUMI awake on port", PORT);
 });
