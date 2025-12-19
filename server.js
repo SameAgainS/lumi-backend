@@ -102,7 +102,7 @@ async function callAI(systemPrompt, userMessage) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "gpt-4.1-mini",
+        model: "gpt-3.5-turbo",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userMessage }
