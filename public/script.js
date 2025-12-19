@@ -17,31 +17,19 @@ async function sendMessage() {
   if (!text || isSending) return;
 
   isSending = true;
-
   addMessage(text, "user");
   input.value = "";
 
   try {
-    console.log("📤 sending:", text);
-
     const res = await fetch("/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: text }),
     });
 
-    console.log("📥 status:", res.status);
-
     const data = await res.json();
-    console.log("📦 data:", data);
-
-    if (data.reply) {
-      addMessage(data.reply, "lumi");
-    } else {
-      addMessage("…I didn’t quite catch that.", "lumi");
-    }
-  } catch (err) {
-    console.error(err);
+    addMessage(data.reply || "…", "lumi");
+  } catch {
     addMessage("Something went quiet on my end.", "lumi");
   }
 
@@ -49,7 +37,6 @@ async function sendMessage() {
 }
 
 sendBtn.addEventListener("click", sendMessage);
-
 input.addEventListener("keydown", (e) => {
   if (e.key === "Enter") sendMessage();
 });

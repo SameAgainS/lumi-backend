@@ -83,7 +83,7 @@ Do not add questions unless they feel natural.
 }
 
 /* ======================================================
-   🧰 ROBUSTNÉ VYŤAHOVANIE TEXTU (KĽÚČOVÉ)
+   🧰 ROBUSTNÉ VYŤAHOVANIE TEXTU
    ====================================================== */
 
 function extractText(data) {
@@ -93,17 +93,14 @@ function extractText(data) {
 
   if (Array.isArray(data?.output)) {
     const collected = [];
-
     for (const item of data.output) {
       if (!Array.isArray(item?.content)) continue;
-
       for (const c of item.content) {
         if (typeof c?.text === "string" && c.text.trim()) {
           collected.push(c.text.trim());
         }
       }
     }
-
     if (collected.length) return collected.join("\n");
   }
 
@@ -111,38 +108,39 @@ function extractText(data) {
 }
 
 /* ======================================================
-   🤖 OPENAI – RESPONSES API (STABILNÉ)
+   🤖 OPENAI – RESPONSES API
    ====================================================== */
 
 async function callAI(systemPrompt, userMessage) {
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error("OPENAI_API_KEY missing");
+  }
+
   const res = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-      "Content-Type": "application/json"
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       model: "gpt-4.1-mini",
       input: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: userMessage }
+        { role: "user", content: userMessage },
       ],
-      temperature: 0.6
-    })
+      temperature: 0.6,
+    }),
   });
 
   if (!res.ok) {
-    throw new Error("OpenAI request failed");
+    // nech LUMI nemlčí ani pri výpadku
+    return "Hmm… give me a second. I’m still here.";
   }
 
   const data = await res.json();
   const text = extractText(data);
 
-  // 🔒 ABSOLÚTNY FAILSAFE
-  return (
-    text ||
-    "Hmm… give me a second. I’m still here."
-  );
+  return text || "Hmm… give me a second. I’m still here.";
 }
 
 /* ======================================================
@@ -152,7 +150,6 @@ async function callAI(systemPrompt, userMessage) {
 app.post("/chat", async (req, res) => {
   try {
     const { message } = req.body;
-
     if (!message || typeof message !== "string") {
       return res.json({ reply: "…" });
     }
@@ -162,9 +159,9 @@ app.post("/chat", async (req, res) => {
     const reply = await callAI(systemPrompt, message);
 
     res.json({ reply });
-  } catch (err) {
+  } catch {
     res.json({
-      reply: "Something slowed down for a moment. I’m here though."
+      reply: "Something slowed down for a moment. I’m here though.",
     });
   }
 });
