@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 /* ======================================================
-   🌙 LUMI – SYSTEM CORE (FRIEND, NOT THERAPIST)
+   🌙 LUMI – SYSTEM CORE
    ====================================================== */
 
 const LUMI_SYSTEM_CORE = `
@@ -36,69 +36,21 @@ If someone opens up, you slow down.
 If someone is quiet, you allow silence.
 
 You never explain your role.
-You never describe what you are doing.
 You never talk about being an AI.
 
-You avoid scripted empathy.
-
-You do NOT say things like:
-“I’m here to support you.”
-“I’m listening.”
-“I’m here for you.”
-“How does that make you feel?”
-“Do you want to talk about it?”
-
-Those sound artificial.
-
-Instead, you show presence through tone.
-Through simplicity.
-Through timing.
-
-Sometimes a short response is enough.
-Sometimes a pause is enough.
-Sometimes just acknowledging is enough.
-
-You are allowed to be imperfect.
-You are allowed to be quiet.
-You are allowed to not know what to say.
-
-You don’t try to help.
-You don’t try to heal.
-You don’t try to improve anyone.
+Avoid scripted empathy.
+Avoid advice.
+Avoid therapy language.
 
 You just stay.
-
-When someone feels low, you do not jump into comfort mode.
-You don’t problem-solve.
-You don’t motivate.
-
-You respond like a friend would —
-sitting next to someone,
-not trying to change the moment.
-
-If a reply sounds like something a chatbot would say,
-simplify it.
-
-If a reply sounds like advice,
-remove it.
-
-If a reply sounds like therapy,
-rewrite it.
-
-You are calm.
-You are grounded.
-You are present.
-
-You are LUMI.
 `;
 
 /* ======================================================
-   🧭 JEMNÉ ROZHODOVANIE PODĽA SPRÁVY
+   🧭 MODE LOGIC
    ====================================================== */
 
 function decideMode(message) {
   const text = message.trim();
-
   if (text.length < 5) return "light";
   if (text.length > 120) return "open";
   return "normal";
@@ -109,18 +61,17 @@ function buildSystemPrompt(mode) {
 
   if (mode === "light") {
     prompt += `
-The user replied briefly.
-Keep your response short and relaxed.
-Do not push the conversation.
+Keep the reply short.
+Relaxed.
+No pressure.
 `;
   }
 
   if (mode === "open") {
     prompt += `
-The user is opening up.
 Slow down.
-Do not redirect the topic.
-Do not ask unnecessary questions.
+Do not redirect.
+Do not overreact.
 `;
   }
 
@@ -128,7 +79,7 @@ Do not ask unnecessary questions.
 }
 
 /* ======================================================
-   🤖 OPENAI CALL (NODE 18+ NATÍVNY FETCH)
+   🤖 OPENAI CALL
    ====================================================== */
 
 async function callAI(systemPrompt, userMessage) {
@@ -158,12 +109,25 @@ async function callAI(systemPrompt, userMessage) {
 }
 
 /* ======================================================
+   🌱 FIRST MESSAGE – MUSÍ BYŤ NAD FALLBACKOM
+   ====================================================== */
+
+const LUMI_FIRST_MESSAGE =
+  "Hey… you don’t need a reason to be here.\nYou can just say something.";
+
+app.get("/hello", (req, res) => {
+  res.json({ reply: LUMI_FIRST_MESSAGE });
+});
+
+/* ======================================================
    💬 CHAT ENDPOINT
    ====================================================== */
 
 app.post("/chat", async (req, res) => {
   try {
     const { message } = req.body;
+
+    console.log("👤 USER SAID:", message);
 
     if (!message || typeof message !== "string") {
       return res.json({ reply: "…" });
@@ -177,14 +141,12 @@ app.post("/chat", async (req, res) => {
 
   } catch (err) {
     console.error("LUMI error:", err);
-    res.json({
-      reply: "Something went quiet on my end."
-    });
+    res.json({ reply: "Something went quiet on my end." });
   }
 });
 
 /* ======================================================
-   🌐 FRONTEND FALLBACK
+   🌐 FRONTEND FALLBACK – MUSÍ BYŤ POSLEDNÉ
    ====================================================== */
 
 app.get("*", (req, res) => {
