@@ -1,4 +1,6 @@
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
@@ -11,6 +13,9 @@ body {
   color: #eaeaf0;
 }
 
+/* ===============================
+   CHAT CONTAINER
+   =============================== */
 #chat-container {
   width: 380px;
   height: 600px;
@@ -22,7 +27,9 @@ body {
   overflow: hidden;
 }
 
-/* HEADER */
+/* ===============================
+   HEADER
+   =============================== */
 #chat-header {
   padding: 16px;
   border-bottom: 1px solid rgba(255,255,255,0.06);
@@ -47,29 +54,20 @@ body {
   gap: 6px;
 }
 
-.brand-row {
-  display: flex;
-  align-items: center;
-}
-
 .title {
   font-size: 18px;
   font-weight: 600;
 }
 
-.mark {
-  margin-left: 22px;
-  margin-top: 2px;
-  opacity: 0.9;
-}
-
-/* SLOGAN */
 .subtitle {
   font-size: 11px;
   opacity: 0.78;
+  line-height: 1.4;
 }
 
-/* CHAT */
+/* ===============================
+   CHAT AREA
+   =============================== */
 #chat-box {
   flex: 1;
   padding: 16px;
@@ -79,6 +77,9 @@ body {
   gap: 12px;
 }
 
+/* ===============================
+   MESSAGES
+   =============================== */
 .message {
   max-width: 80%;
   padding: 12px 14px;
@@ -99,7 +100,44 @@ body {
   align-self: flex-end;
 }
 
-/* INPUT */
+/* ===============================
+   TYPING INDICATOR (BOUNCING DOTS)
+   =============================== */
+.message.typing {
+  display: flex;
+  gap: 4px;
+  opacity: 0.6;
+  font-size: 18px;
+}
+
+.message.typing span {
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.message.typing span:nth-child(1) {
+  animation-delay: 0s;
+}
+.message.typing span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.message.typing span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  40% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
+}
+
+/* ===============================
+   INPUT
+   =============================== */
 #input-area {
   display: flex;
   gap: 10px;
@@ -125,4 +163,5 @@ body {
   padding: 0 18px;
   font-weight: 600;
   cursor: pointer;
+  color: #0c0c14;
 }

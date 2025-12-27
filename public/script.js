@@ -16,7 +16,7 @@ function addMessage(text, sender) {
 }
 
 /* ===============================
-   TYPING INDICATOR (…)
+   TYPING INDICATOR (BOUNCING DOTS)
    =============================== */
 function showTyping() {
   if (document.getElementById("lumi-typing")) return;
@@ -24,7 +24,7 @@ function showTyping() {
   const typing = document.createElement("div");
   typing.className = "message lumi typing";
   typing.id = "lumi-typing";
-  typing.innerText = "…";
+  typing.innerHTML = "<span>.</span><span>.</span><span>.</span>";
   chatBox.appendChild(typing);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
@@ -46,7 +46,6 @@ async function sendMessage() {
   input.value = "";
 
   try {
-    // 👇 LUMI "thinking…"
     showTyping();
 
     const res = await fetch("/chat", {
@@ -57,7 +56,6 @@ async function sendMessage() {
 
     const data = await res.json();
 
-    // 👇 garantovaný čas, aby boli bodky VIDITEĽNÉ
     setTimeout(() => {
       removeTyping();
       addMessage(data.reply || "…", "lumi");
@@ -89,7 +87,7 @@ window.addEventListener("load", async () => {
     if (data.reply) {
       addMessage(data.reply, "lumi");
     }
-  } catch (e) {
+  } catch {
     console.error("LUMI hello failed");
   }
 });
