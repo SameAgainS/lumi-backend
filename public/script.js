@@ -40,3 +40,16 @@ sendBtn.addEventListener("click", sendMessage);
 input.addEventListener("keydown", (e) => {
   if (e.key === "Enter") sendMessage();
 });
+
+/* 🌱 FIRST MESSAGE FROM LUMI */
+window.addEventListener("load", async () => {
+  try {
+    const res = await fetch("/hello");
+    const data = await res.json();
+    if (data.reply) {
+      addMessage(data.reply, "lumi");
+    }
+  } catch (e) {
+    console.error("LUMI hello failed");
+  }
+});
