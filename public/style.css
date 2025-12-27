@@ -10,6 +10,7 @@ body {
   justify-content: center;
   align-items: center;
   color: #eaeaf0;
+  background: #0b0918;
 }
 
 /* ===============================
@@ -18,17 +19,18 @@ body {
 .background-image {
   position: fixed;
   inset: 0;
+  background-color: #0b0918;
   background-image:
     linear-gradient(
-      rgba(26, 18, 48, 0.78),
-      rgba(26, 18, 48, 0.78)
+      rgba(18, 12, 38, 0.88),
+      rgba(18, 12, 38, 0.88)
     ),
-    url("moon-bg.jpg"); /* obrazok */
+    url("moon-bg.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  filter: blur(2px);
-  opacity: 0.55;
+  filter: blur(1px);
+  opacity: 0.35;
   z-index: -3;
 }
 
@@ -38,10 +40,10 @@ body {
 #chat-container {
   width: 380px;
   height: 600px;
-  background: rgba(20,22,45,0.92);
+  background: rgba(15, 17, 35, 0.94);
   backdrop-filter: blur(8px);
   border-radius: 18px;
-  box-shadow: 0 30px 80px rgba(0,0,0,.6);
+  box-shadow: 0 30px 80px rgba(0,0,0,.7);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -168,6 +170,10 @@ body {
   color: #fff;
   font-size: 14px;
   outline: none;
+}
+
+#user-input::placeholder {
+  color: rgba(255,255,255,0.55);
 }
 
 #send-btn {
