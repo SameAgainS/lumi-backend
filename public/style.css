@@ -10,7 +10,7 @@ body {
   justify-content: center;
   align-items: center;
   color: #eaeaf0;
-  background: #0b0918;
+  background: #0e0b1f;
 }
 
 /* ===============================
@@ -19,18 +19,18 @@ body {
 .background-image {
   position: fixed;
   inset: 0;
-  background-color: #0b0918;
+  background-color: #0e0b1f;
   background-image:
     linear-gradient(
-      rgba(18, 12, 38, 0.88),
-      rgba(18, 12, 38, 0.88)
+      rgba(28, 22, 68, 0.65),
+      rgba(28, 22, 68, 0.65)
     ),
     url("moon-bg.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   filter: blur(1px);
-  opacity: 0.35;
+  opacity: 0.55;
   z-index: -3;
 }
 
@@ -40,10 +40,12 @@ body {
 #chat-container {
   width: 380px;
   height: 600px;
-  background: rgba(15, 17, 35, 0.94);
-  backdrop-filter: blur(8px);
+  background: rgba(18, 20, 45, 0.90);
+  backdrop-filter: blur(6px);
   border-radius: 18px;
-  box-shadow: 0 30px 80px rgba(0,0,0,.7);
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.65),
+    0 0 40px rgba(140,120,255,0.15);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -67,7 +69,7 @@ body {
   height: 64px;
   border-radius: 50%;
   object-fit: cover;
-  box-shadow: 0 0 20px rgba(140,120,255,0.45);
+  box-shadow: 0 0 25px rgba(160,140,255,0.55);
 }
 
 .brand-block {
@@ -83,7 +85,7 @@ body {
 
 .subtitle {
   font-size: 11px;
-  opacity: 0.78;
+  opacity: 0.85;
   line-height: 1.4;
 }
 
@@ -97,6 +99,30 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+
+  /* Firefox scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(140,120,255,0.35) transparent;
+}
+
+/* ===============================
+   CUSTOM SCROLLBAR (CHROME / EDGE)
+   =============================== */
+#chat-box::-webkit-scrollbar {
+  width: 6px;
+}
+
+#chat-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#chat-box::-webkit-scrollbar-thumb {
+  background: rgba(140,120,255,0.25);
+  border-radius: 10px;
+}
+
+#chat-box::-webkit-scrollbar-thumb:hover {
+  background: rgba(160,140,255,0.45);
 }
 
 /* ===============================
@@ -111,13 +137,13 @@ body {
 }
 
 .message.lumi {
-  background: linear-gradient(135deg, #7f6bff, #9b8cff);
+  background: linear-gradient(135deg, #8f82ff, #a79cff);
   color: #0c0c14;
   align-self: flex-start;
 }
 
 .message.user {
-  background: rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.10);
   color: #fff;
   align-self: flex-end;
 }
@@ -128,7 +154,7 @@ body {
 .message.typing {
   display: flex;
   gap: 4px;
-  opacity: 0.6;
+  opacity: 0.75;
   font-size: 18px;
 }
 
@@ -143,7 +169,7 @@ body {
 @keyframes bounce {
   0%, 80%, 100% {
     transform: translateY(0);
-    opacity: 0.4;
+    opacity: 0.5;
   }
   40% {
     transform: translateY(-6px);
@@ -163,7 +189,7 @@ body {
 
 #user-input {
   flex: 1;
-  background: rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.10);
   border: none;
   border-radius: 12px;
   padding: 12px 14px;
@@ -173,11 +199,11 @@ body {
 }
 
 #user-input::placeholder {
-  color: rgba(255,255,255,0.55);
+  color: rgba(255,255,255,0.7);
 }
 
 #send-btn {
-  background: linear-gradient(135deg, #7f6bff, #9b8cff);
+  background: linear-gradient(135deg, #8f82ff, #a79cff);
   border: none;
   border-radius: 12px;
   padding: 0 18px;
